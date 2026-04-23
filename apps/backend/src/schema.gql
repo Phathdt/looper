@@ -2,6 +2,79 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+type Comment {
+  author: User!
+  content: String!
+  createdAt: DateTime!
+  id: ID!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  addComment(content: String!, postId: ID!): Comment!
+  createPost(content: String!): Post!
+  follow(userId: ID!): Boolean!
+  login(input: LoginInput!): AuthPayload!
+  register(input: RegisterInput!): AuthPayload!
+  unfollow(userId: ID!): Boolean!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+type Post {
+  author: User!
+  comments: [Comment!]!
+  content: String!
+  createdAt: DateTime!
+  id: ID!
+  likesCount: Int!
+}
+
+type PostConnection {
+  edges: [PostEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PostEdge {
+  cursor: String!
+  node: Post!
+}
+
 type Query {
+  feed(after: String, first: Int = 10): PostConnection!
   health: String!
+  user(id: ID!): User!
+}
+
+input RegisterInput {
+  email: String!
+  name: String!
+  password: String!
+}
+
+type User {
+  createdAt: DateTime!
+  email: String!
+  followersCount: Int!
+  id: ID!
+  isFollowing: Boolean!
+  name: String!
+  posts(first: Int = 20): [Post!]!
 }

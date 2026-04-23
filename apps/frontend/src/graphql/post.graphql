@@ -1,0 +1,22 @@
+mutation CreatePost($content: String!) {
+  createPost(content: $content) {
+    id
+    content
+    createdAt
+    author {
+      id
+      name
+    }
+  }
+}
+
+mutation AddComment($postId: ID!, $content: String!) {
+  addComment(postId: $postId, content: $content) {
+    id
+    content
+    author {
+      id
+      name
+    }
+  }
+}

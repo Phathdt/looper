@@ -1,0 +1,1126 @@
+[
+  {
+    "description": "  As an unauthenticated visitor\n  I should not access protected pages\n  So that my data stays private",
+    "elements": [
+      {
+        "description": "",
+        "id": "protected-route-guard;protected-page-redirects-to-login",
+        "keyword": "Scenario Outline",
+        "line": 14,
+        "name": "Protected page redirects to login",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 378831624
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 9,
+            "name": "I visit the protected page \"/\" without auth",
+            "match": {
+              "location": "tests/features/auth/auth-guard.steps.ts:7"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 199042083
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 10,
+            "name": "I should be redirected to the login page",
+            "match": {
+              "location": "tests/features/auth/logout.steps.ts:12"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 11829999
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 19670666
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@auth",
+            "line": 1
+          },
+          {
+            "name": "@auth-guard",
+            "line": 1
+          },
+          {
+            "name": "@priority_high",
+            "line": 7
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "protected-route-guard;protected-page-redirects-to-login",
+        "keyword": "Scenario Outline",
+        "line": 15,
+        "name": "Protected page redirects to login",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 82629166
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 9,
+            "name": "I visit the protected page \"/create\" without auth",
+            "match": {
+              "location": "tests/features/auth/auth-guard.steps.ts:7"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 130668583
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 10,
+            "name": "I should be redirected to the login page",
+            "match": {
+              "location": "tests/features/auth/logout.steps.ts:12"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 9263040
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 12688333
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@auth",
+            "line": 1
+          },
+          {
+            "name": "@auth-guard",
+            "line": 1
+          },
+          {
+            "name": "@priority_high",
+            "line": 7
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "protected-route-guard",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "Protected route guard",
+    "tags": [
+      {
+        "name": "@auth",
+        "line": 1
+      },
+      {
+        "name": "@auth-guard",
+        "line": 1
+      }
+    ],
+    "uri": "tests/features/auth/auth-guard.feature"
+  },
+  {
+    "description": "  As a Looper user\n  I want to log in with my credentials\n  So that I can see my feed",
+    "elements": [
+      {
+        "description": "",
+        "id": "user-authentication---login;successful-login-with-seeded-credentials",
+        "keyword": "Scenario",
+        "line": 8,
+        "name": "Successful login with seeded credentials",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 82011458
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 9,
+            "name": "I navigate to the login page",
+            "match": {
+              "location": "tests/features/auth/login.steps.ts:8"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 82850374
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 10,
+            "name": "I submit valid login credentials",
+            "match": {
+              "location": "tests/features/auth/login.steps.ts:13"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 81877500
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 11,
+            "name": "I should be redirected to the feed page",
+            "match": {
+              "location": "tests/features/auth/login.steps.ts:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 107186458
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 14407416
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@auth",
+            "line": 1
+          },
+          {
+            "name": "@auth-login",
+            "line": 1
+          },
+          {
+            "name": "@smoke",
+            "line": 7
+          },
+          {
+            "name": "@priority_high",
+            "line": 7
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-authentication---login;failed-login-with-invalid-credentials",
+        "keyword": "Scenario",
+        "line": 14,
+        "name": "Failed login with invalid credentials",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 84601290
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 15,
+            "name": "I navigate to the login page",
+            "match": {
+              "location": "tests/features/auth/login.steps.ts:8"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 79719582
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 16,
+            "name": "I submit invalid login credentials",
+            "match": {
+              "location": "tests/features/auth/login.steps.ts:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 52211041
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 17,
+            "name": "I should remain on the login page",
+            "match": {
+              "location": "tests/features/auth/login.steps.ts:28"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1614167
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 18,
+            "name": "I should see a login error",
+            "match": {
+              "location": "tests/features/auth/login.steps.ts:32"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 104551875
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 15608458
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@auth",
+            "line": 1
+          },
+          {
+            "name": "@auth-login",
+            "line": 1
+          },
+          {
+            "name": "@priority_high",
+            "line": 13
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "user-authentication---login",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "User Authentication - Login",
+    "tags": [
+      {
+        "name": "@auth",
+        "line": 1
+      },
+      {
+        "name": "@auth-login",
+        "line": 1
+      }
+    ],
+    "uri": "tests/features/auth/login.feature"
+  },
+  {
+    "description": "  As a logged-in user\n  I want to log out\n  So that my session ends and I can't access protected pages",
+    "elements": [
+      {
+        "description": "",
+        "id": "user-authentication---logout;logout-returns-to-login-page",
+        "keyword": "Scenario",
+        "line": 8,
+        "name": "Logout returns to login page",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 84759833
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 9,
+            "name": "I am logged in as the seeded user",
+            "match": {
+              "location": "tests/features/feed/feed.steps.ts:8"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 246234541
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 10,
+            "name": "I click the logout button",
+            "match": {
+              "location": "tests/features/auth/logout.steps.ts:7"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 14737750
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 11,
+            "name": "I should be redirected to the login page",
+            "match": {
+              "location": "tests/features/auth/logout.steps.ts:12"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1229959
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 12881374
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@auth",
+            "line": 1
+          },
+          {
+            "name": "@auth-logout",
+            "line": 1
+          },
+          {
+            "name": "@priority_high",
+            "line": 7
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "user-authentication---logout",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "User Authentication - Logout",
+    "tags": [
+      {
+        "name": "@auth",
+        "line": 1
+      },
+      {
+        "name": "@auth-logout",
+        "line": 1
+      }
+    ],
+    "uri": "tests/features/auth/logout.feature"
+  },
+  {
+    "description": "  As a new user\n  I want to create an account\n  So that I can start using Looper",
+    "elements": [
+      {
+        "description": "",
+        "id": "user-authentication---register;successful-registration-with-new-email",
+        "keyword": "Scenario",
+        "line": 8,
+        "name": "Successful registration with new email",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 82416166
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 9,
+            "name": "I navigate to the register page",
+            "match": {
+              "location": "tests/features/auth/register.steps.ts:9"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 75714207
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 10,
+            "name": "I register with a unique email",
+            "match": {
+              "location": "tests/features/auth/register.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 62444708
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 11,
+            "name": "I should be redirected to the feed page",
+            "match": {
+              "location": "tests/features/auth/login.steps.ts:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 106507000
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 13691874
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@auth",
+            "line": 1
+          },
+          {
+            "name": "@auth-register",
+            "line": 1
+          },
+          {
+            "name": "@priority_high",
+            "line": 7
+          }
+        ],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "user-authentication---register;register-fails-with-existing-email",
+        "keyword": "Scenario",
+        "line": 14,
+        "name": "Register fails with existing email",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 84631583
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 15,
+            "name": "I navigate to the register page",
+            "match": {
+              "location": "tests/features/auth/register.steps.ts:9"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 78842167
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 16,
+            "name": "I register with an existing email",
+            "match": {
+              "location": "tests/features/auth/register.steps.ts:23"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 55560917
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 17,
+            "name": "I should remain on the register page",
+            "match": {
+              "location": "tests/features/auth/register.steps.ts:29"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1653249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 18,
+            "name": "I should see a register error",
+            "match": {
+              "location": "tests/features/auth/register.steps.ts:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2508959
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 12383458
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@auth",
+            "line": 1
+          },
+          {
+            "name": "@auth-register",
+            "line": 1
+          },
+          {
+            "name": "@priority_medium",
+            "line": 13
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "user-authentication---register",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "User Authentication - Register",
+    "tags": [
+      {
+        "name": "@auth",
+        "line": 1
+      },
+      {
+        "name": "@auth-register",
+        "line": 1
+      }
+    ],
+    "uri": "tests/features/auth/register.feature"
+  },
+  {
+    "description": "  As a logged-in user\n  I want to browse the feed\n  So that I can see posts from people I follow",
+    "elements": [
+      {
+        "description": "",
+        "id": "feed;feed-loads-with-posts-after-login",
+        "keyword": "Scenario",
+        "line": 8,
+        "name": "Feed loads with posts after login",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 81490416
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 9,
+            "name": "I am logged in as the seeded user",
+            "match": {
+              "location": "tests/features/feed/feed.steps.ts:8"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 242489292
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 10,
+            "name": "I visit the feed page",
+            "match": {
+              "location": "tests/features/feed/feed.steps.ts:17"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 45428125
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 11,
+            "name": "I should see at least one post",
+            "match": {
+              "location": "tests/features/feed/feed.steps.ts:21"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 9035790
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 12182375
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@feed",
+            "line": 1
+          },
+          {
+            "name": "@smoke",
+            "line": 7
+          },
+          {
+            "name": "@priority_high",
+            "line": 7
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "feed",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "Feed",
+    "tags": [
+      {
+        "name": "@feed",
+        "line": 1
+      }
+    ],
+    "uri": "tests/features/feed/feed.feature"
+  },
+  {
+    "description": "  As a logged-in user\n  I want to comment on a post\n  So that I can interact with the author",
+    "elements": [
+      {
+        "description": "",
+        "id": "add-comment-to-post;add-a-comment-from-the-feed",
+        "keyword": "Scenario",
+        "line": 8,
+        "name": "Add a comment from the feed",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 87017958
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 9,
+            "name": "I am logged in as the seeded user",
+            "match": {
+              "location": "tests/features/feed/feed.steps.ts:8"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 237047958
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 10,
+            "name": "I visit the feed page",
+            "match": {
+              "location": "tests/features/feed/feed.steps.ts:17"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 45169584
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 11,
+            "name": "I expand the first post's comments",
+            "match": {
+              "location": "tests/features/post/add-comment.steps.ts:7"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 23311416
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 12,
+            "name": "I submit a comment \"Nice post e2e\"",
+            "match": {
+              "location": "tests/features/post/add-comment.steps.ts:12"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 22210666
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 13,
+            "name": "the comment \"Nice post e2e\" should be visible",
+            "match": {
+              "location": "tests/features/post/add-comment.steps.ts:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 105770708
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 18329958
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@post",
+            "line": 1
+          },
+          {
+            "name": "@add-comment",
+            "line": 1
+          },
+          {
+            "name": "@priority_medium",
+            "line": 7
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "add-comment-to-post",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "Add Comment to Post",
+    "tags": [
+      {
+        "name": "@post",
+        "line": 1
+      },
+      {
+        "name": "@add-comment",
+        "line": 1
+      }
+    ],
+    "uri": "tests/features/post/add-comment.feature"
+  },
+  {
+    "description": "  As a logged-in user\n  I want to create a new post\n  So that my followers can see it in their feed",
+    "elements": [
+      {
+        "description": "",
+        "id": "create-post;create-a-post-from-the-create-page",
+        "keyword": "Scenario",
+        "line": 8,
+        "name": "Create a post from the create page",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 85737624
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 9,
+            "name": "I am logged in as the seeded user",
+            "match": {
+              "location": "tests/features/feed/feed.steps.ts:8"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 239362709
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 10,
+            "name": "I navigate to the create post page",
+            "match": {
+              "location": "tests/features/post/create-post.steps.ts:9"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 47470374
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 11,
+            "name": "I submit a new post with content \"Hello from e2e test\"",
+            "match": {
+              "location": "tests/features/post/create-post.steps.ts:14"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 30918791
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 12,
+            "name": "I should be redirected to the feed page",
+            "match": {
+              "location": "tests/features/auth/login.steps.ts:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 106823540
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 13,
+            "name": "I should see my new post at the top of the feed",
+            "match": {
+              "location": "tests/features/post/create-post.steps.ts:23"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2741041
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 16724459
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@post",
+            "line": 1
+          },
+          {
+            "name": "@create-post",
+            "line": 1
+          },
+          {
+            "name": "@smoke",
+            "line": 7
+          },
+          {
+            "name": "@priority_high",
+            "line": 7
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "create-post",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "Create Post",
+    "tags": [
+      {
+        "name": "@post",
+        "line": 1
+      },
+      {
+        "name": "@create-post",
+        "line": 1
+      }
+    ],
+    "uri": "tests/features/post/create-post.feature"
+  },
+  {
+    "description": "  As a logged-in user\n  I want to follow other users\n  So that their posts appear in my feed",
+    "elements": [
+      {
+        "description": "",
+        "id": "follow-/-unfollow-user;follow-and-unfollow-another-user-via-profile",
+        "keyword": "Scenario",
+        "line": 8,
+        "name": "Follow and unfollow another user via profile",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 83925541
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 9,
+            "name": "I am logged in as the seeded user",
+            "match": {
+              "location": "tests/features/feed/feed.steps.ts:8"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 240880250
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 10,
+            "name": "I visit the profile of user \"bob\"",
+            "match": {
+              "location": "tests/features/user/follow.steps.ts:21"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 244339625
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 11,
+            "name": "I click the follow button",
+            "match": {
+              "location": "tests/features/user/follow.steps.ts:30"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 9935166
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 12,
+            "name": "I should see the unfollow button",
+            "match": {
+              "location": "tests/features/user/follow.steps.ts:42"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 104528667
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 13,
+            "name": "I click the unfollow button",
+            "match": {
+              "location": "tests/features/user/follow.steps.ts:34"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 19501665
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 14,
+            "name": "I should see the follow button",
+            "match": {
+              "location": "tests/features/user/follow.steps.ts:38"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 105276166
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 16302834
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@user",
+            "line": 1
+          },
+          {
+            "name": "@follow",
+            "line": 1
+          },
+          {
+            "name": "@priority_high",
+            "line": 7
+          }
+        ],
+        "type": "scenario"
+      }
+    ],
+    "id": "follow-/-unfollow-user",
+    "line": 2,
+    "keyword": "Feature",
+    "name": "Follow / Unfollow User",
+    "tags": [
+      {
+        "name": "@user",
+        "line": 1
+      },
+      {
+        "name": "@follow",
+        "line": 1
+      }
+    ],
+    "uri": "tests/features/user/follow.feature"
+  }
+]

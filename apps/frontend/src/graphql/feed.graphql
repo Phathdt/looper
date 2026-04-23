@@ -1,0 +1,29 @@
+query Feed($first: Int, $after: String) {
+  feed(first: $first, after: $after) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      cursor
+      node {
+        id
+        content
+        createdAt
+        likesCount
+        author {
+          id
+          name
+        }
+        comments {
+          id
+          content
+          author {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+}

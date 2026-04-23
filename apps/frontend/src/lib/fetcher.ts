@@ -1,18 +1,28 @@
+import { authStore } from "./auth-store";
+
 const GRAPHQL_ENDPOINT = import.meta.env.VITE_GRAPHQL_ENDPOINT ?? "http://localhost:4000/graphql";
 
-export async function fetcher<TData, TVariables>(
+export const fetcher = <TData, TVariables>(
   query: string,
   variables?: TVariables,
-): Promise<TData> {
-  const res = await fetch(GRAPHQL_ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query, variables }),
-  });
+  headers?: HeadersInit,
+): (() => Promise<TData>) => {
+  return async () => {
+    const token = authStore.getState().token;
+    const res = await fetch(GRAPHQL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+      body: JSON.stringify({ query, variables }),
+    });
 
-  const json = await res.json();
-  if (json.errors) {
-    throw new Error(json.errors[0]?.message ?? "GraphQL error");
-  }
-  return json.data;
-}
+    const json = await res.json();
+    if (json.errors) {
+      throw new Error(json.errors[0]?.message ?? "GraphQL error");
+    }
+    return json.data as TData;
+  };
+};

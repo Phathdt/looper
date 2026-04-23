@@ -1,0 +1,29 @@
+{
+  "name": "e2e",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "test": "cucumber-js --config .cucumber.js 2>&1 | tee test-results/test-output.log",
+    "test:headed": "HEADLESS=false cucumber-js --config .cucumber.js",
+    "test:smoke": "cucumber-js --config .cucumber.js --tags @smoke",
+    "test:auth": "cucumber-js --config .cucumber.js --tags @auth",
+    "test:feed": "cucumber-js --config .cucumber.js --tags @feed",
+    "type-check": "tsc --noEmit",
+    "install:browsers": "playwright install chromium",
+    "clean": "rm -rf test-results"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.0.0",
+    "dotenv": "^16.4.5",
+    "pino": "^9.5.0",
+    "pino-pretty": "^11.3.0"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^11.0.0",
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.7.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.6.0"
+  }
+}

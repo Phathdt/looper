@@ -1,0 +1,27 @@
+node_modules
+dist
+.next
+.turbo
+coverage
+
+# env
+.env
+.env.local
+.env.*.local
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# editor
+.DS_Store
+.vscode/*
+!.vscode/settings.json
+.idea
+
+# generated
+apps/frontend/src/generated
+
+# claude
+.claude_sessions/

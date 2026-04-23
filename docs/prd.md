@@ -8,12 +8,12 @@
 
 Build a mini social network fullstack application to demonstrate:
 
-* GraphQL schema design
-* Resolver architecture in NestJS
-* N+1 problem & DataLoader optimization
-* Prisma ORM usage
-* Frontend integration with React + GraphQL + React Query
-* End-to-end type safety via code generation
+- GraphQL schema design
+- Resolver architecture in NestJS
+- N+1 problem & DataLoader optimization
+- Prisma ORM usage
+- Frontend integration with React + GraphQL + React Query
+- End-to-end type safety via code generation
 
 ---
 
@@ -38,10 +38,10 @@ root/
 
 `turbo.json` định nghĩa các task chính:
 
-* `dev` — chạy song song backend + frontend
-* `build` — build theo dependency graph (backend build trước khi FE codegen nếu cần)
-* `lint`, `test`, `type-check`
-* `generate` — GraphQL codegen (phụ thuộc output schema của backend)
+- `dev` — chạy song song backend + frontend
+- `build` — build theo dependency graph (backend build trước khi FE codegen nếu cần)
+- `lint`, `test`, `type-check`
+- `generate` — GraphQL codegen (phụ thuộc output schema của backend)
 
 ### Root Scripts
 
@@ -66,29 +66,29 @@ pnpm --filter frontend dev
 
 ### Monorepo Tooling
 
-* Turborepo (task orchestration, remote cache)
-* pnpm workspaces (package management)
-* TypeScript (shared config via `packages/tsconfig`)
+- Turborepo (task orchestration, remote cache)
+- pnpm workspaces (package management)
+- TypeScript (shared config via `packages/tsconfig`)
 
 ---
 
 ### Backend (`apps/backend`)
 
-* NestJS
-* GraphQL (Apollo)
-* Prisma
-* PostgreSQL
-* DataLoader (N+1 optimization)
-* JWT Auth
+- NestJS
+- GraphQL (Apollo)
+- Prisma
+- PostgreSQL
+- DataLoader (N+1 optimization)
+- JWT Auth
 
 ---
 
 ### Frontend (`apps/frontend`)
 
-* React (Vite)
-* React Query
-* GraphQL Code Generator
-* Fetch-based GraphQL client (custom fetcher)
+- React (Vite)
+- React Query
+- GraphQL Code Generator
+- Fetch-based GraphQL client (custom fetcher)
 
 ---
 
@@ -96,19 +96,19 @@ pnpm --filter frontend dev
 
 ### Primary Goals
 
-* Implement GraphQL API with nested relations
-* Demonstrate N+1 problem and solve using DataLoader
-* Integrate frontend with generated hooks (no manual typing)
-* Implement pagination and basic auth
+- Implement GraphQL API with nested relations
+- Demonstrate N+1 problem and solve using DataLoader
+- Integrate frontend with generated hooks (no manual typing)
+- Implement pagination and basic auth
 
 ---
 
 ### Non-Goals
 
-* Realtime (subscriptions)
-* File uploads
-* Advanced UI/UX
-* Microservices architecture
+- Realtime (subscriptions)
+- File uploads
+- Advanced UI/UX
+- Microservices architecture
 
 ---
 
@@ -116,9 +116,9 @@ pnpm --filter frontend dev
 
 ### 5.1 Authentication
 
-* Register
-* Login (JWT)
-* Inject user into GraphQL context
+- Register
+- Login (JWT)
+- Inject user into GraphQL context
 
 ---
 
@@ -126,9 +126,9 @@ pnpm --filter frontend dev
 
 #### Query: `feed(first, after)`
 
-* Returns posts from followed users
-* Cursor-based pagination
-* Sorted by `createdAt DESC`
+- Returns posts from followed users
+- Cursor-based pagination
+- Sorted by `createdAt DESC`
 
 ---
 
@@ -138,11 +138,11 @@ pnpm --filter frontend dev
 
 Fields:
 
-* id
-* name
-* followersCount
-* isFollowing (viewer-based)
-* posts
+- id
+- name
+- followersCount
+- isFollowing (viewer-based)
+- posts
 
 ---
 
@@ -150,15 +150,15 @@ Fields:
 
 Fields:
 
-* id
-* content
-* author
-* comments
-* likesCount
+- id
+- content
+- author
+- comments
+- likesCount
 
 Mutation:
 
-* createPost(content)
+- createPost(content)
 
 ---
 
@@ -166,13 +166,13 @@ Mutation:
 
 Fields:
 
-* id
-* content
-* author
+- id
+- content
+- author
 
 Mutation:
 
-* addComment(postId, content)
+- addComment(postId, content)
 
 ---
 
@@ -180,8 +180,8 @@ Mutation:
 
 Mutations:
 
-* follow(userId)
-* unfollow(userId)
+- follow(userId)
+- unfollow(userId)
 
 ---
 
@@ -274,8 +274,8 @@ query {
 
 ### Issue
 
-* Multiple DB calls per entity
-* Exponential query growth
+- Multiple DB calls per entity
+- Exponential query growth
 
 ---
 
@@ -283,8 +283,8 @@ query {
 
 Use DataLoader:
 
-* `userLoader` → batch user queries
-* `commentByPostLoader` → batch comments
+- `userLoader` → batch user queries
+- `commentByPostLoader` → batch comments
 
 ---
 
@@ -292,10 +292,10 @@ Use DataLoader:
 
 ### Layers
 
-* Resolver
-* Service
-* Prisma Client
-* DataLoader (per-request scope)
+- Resolver
+- Service
+- Prisma Client
+- DataLoader (per-request scope)
 
 ---
 
@@ -342,70 +342,67 @@ pnpm --filter frontend generate
 
 4. Auto-generate:
 
-* TypeScript types
-* React Query hooks
+- TypeScript types
+- React Query hooks
 
 ---
 
 ### Example Usage
 
 ```ts
-const { data, isLoading } = useFeedQuery()
+const { data, isLoading } = useFeedQuery();
 ```
 
 ---
 
 ## 11. Data Fetching Strategy
 
-* Use React Query for:
+- Use React Query for:
+  - caching
+  - loading state
+  - retry
+  - pagination
 
-  * caching
-  * loading state
-  * retry
-  * pagination
-
-* Use GraphQL Codegen for:
-
-  * type-safe hooks
-  * API contract sync
+- Use GraphQL Codegen for:
+  - type-safe hooks
+  - API contract sync
 
 ---
 
 ## 12. Pagination
 
-* Cursor-based (GraphQL)
-* Infinite scroll (React Query `useInfiniteQuery`)
+- Cursor-based (GraphQL)
+- Infinite scroll (React Query `useInfiniteQuery`)
 
 ---
 
 ## 13. Performance Requirements
 
-* Eliminate N+1 queries
-* Batch DB calls via DataLoader
-* Optimize resolver execution
+- Eliminate N+1 queries
+- Batch DB calls via DataLoader
+- Optimize resolver execution
 
 ---
 
 ## 14. Deliverables
 
-* Turborepo monorepo (`apps/backend` + `apps/frontend`)
-* README including:
-
-  * Monorepo setup (Turborepo + pnpm workspaces)
-  * Architecture explanation
-  * N+1 problem (before/after)
-  * Setup guide
-  * API examples
+- Turborepo monorepo (`apps/backend` + `apps/frontend`)
+- README including:
+  - Monorepo setup (Turborepo + pnpm workspaces)
+  - Architecture explanation
+  - N+1 problem (before/after)
+  - Setup guide
+  - API examples
 
 ---
 
 ## 15. Success Criteria
 
-* GraphQL nested queries working
-* DataLoader reduces query count
-* Frontend fully typed (no manual types)
-* Clean modular structure
-* FE consumes BE via generated hooks
+- GraphQL nested queries working
+- DataLoader reduces query count
+- Frontend fully typed (no manual types)
+- Clean modular structure
+- FE consumes BE via generated hooks
 
 ---
 
@@ -413,42 +410,42 @@ const { data, isLoading } = useFeedQuery()
 
 ### Day 1–2
 
-* Prisma schema
-* DB setup
+- Prisma schema
+- DB setup
 
 ### Day 3–4
 
-* GraphQL schema + resolvers
+- GraphQL schema + resolvers
 
 ### Day 5
 
-* DataLoader (N+1 fix)
+- DataLoader (N+1 fix)
 
 ### Day 6
 
-* Frontend setup + codegen integration
+- Frontend setup + codegen integration
 
 ### Day 7
 
-* Pagination + README + polish
+- Pagination + README + polish
 
 ---
 
 ## 17. Optional Enhancements
 
-* Infinite scroll UI
-* Like system
-* Basic caching
-* Logging query count (N+1 proof)
+- Infinite scroll UI
+- Like system
+- Basic caching
+- Logging query count (N+1 proof)
 
 ---
 
 ## 18. Key Selling Points (for CV)
 
-* Solved N+1 problem using DataLoader
-* Designed GraphQL schema with nested relations
-* Implemented end-to-end type-safe API
-* Integrated React Query with generated hooks
-* Demonstrated real-world backend patterns
+- Solved N+1 problem using DataLoader
+- Designed GraphQL schema with nested relations
+- Implemented end-to-end type-safe API
+- Integrated React Query with generated hooks
+- Demonstrated real-world backend patterns
 
 ---

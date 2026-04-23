@@ -1,0 +1,4 @@
+{
+  "*.{ts,tsx,js,cjs,mjs}": ["oxlint --fix", "prettier --write"],
+  "*.{json,md,yml,yaml,graphql,html,css}": ["prettier --write"]
+}

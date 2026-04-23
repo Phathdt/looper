@@ -3,15 +3,13 @@ pre-commit:
   commands:
     lint-staged:
       run: pnpm lint-staged
-
-pre-push:
-  commands:
     typecheck:
+      glob: "*.{ts,tsx}"
       run: pnpm typecheck
 
 commit-msg:
   commands:
     lint:
       run: |
-        head -1 "$1" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?!?: .+' \
+        head -1 {1} | grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?!?: .+' \
           || { echo "Commit message must follow Conventional Commits (e.g. feat: add login)"; exit 1; }

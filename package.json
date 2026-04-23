@@ -1,7 +1,7 @@
 {
   "name": "looper",
   "private": true,
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "pnpm@10.33.2",
   "scripts": {
     "dev": "turbo run dev",
     "dev:be": "pnpm --filter backend dev",
@@ -26,9 +26,9 @@
     "lefthook": "^1.8.0",
     "lint-staged": "^15.2.10",
     "oxlint": "^0.13.0",
-    "prettier": "^3.3.3",
-    "turbo": "^2.3.0",
-    "typescript": "^5.6.0"
+    "prettier": "^3.8.3",
+    "turbo": "^2.9.6",
+    "typescript": "^5.9.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

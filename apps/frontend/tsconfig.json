@@ -1,11 +1,6 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@looper/tsconfig/react.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "jsx": "react-jsx",
-    "useDefineForClassFields": true,
-    "noEmit": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

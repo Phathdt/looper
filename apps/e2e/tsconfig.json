@@ -1,10 +1,6 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@looper/tsconfig/node.json",
   "compilerOptions": {
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM"],
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
@@ -12,9 +8,7 @@
       "@page-objects/*": ["page-objects/*"],
       "@utils/*": ["utils/*"],
       "@support/*": ["tests/support/*"]
-    },
-    "types": ["node"],
-    "isolatedModules": false
+    }
   },
   "include": ["config/**/*", "page-objects/**/*", "tests/**/*", "utils/**/*"],
   "exclude": ["node_modules", "dist", "test-results"]

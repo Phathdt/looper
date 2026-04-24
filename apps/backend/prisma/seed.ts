@@ -1,7 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+import "dotenv/config";
+import { PrismaClient } from "./generated/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+});
 
 async function main() {
   await prisma.comment.deleteMany();
@@ -24,7 +28,7 @@ async function main() {
     ),
   );
 
-  const posts = [];
+  const posts: Array<{ id: string; authorId: string; content: string; createdAt: Date }> = [];
   for (let i = 0; i < 20; i++) {
     const author = users[i % users.length];
     posts.push(
@@ -50,15 +54,27 @@ async function main() {
     });
   }
 
-  for (const follower of users) {
-    for (const following of users) {
-      if (follower.id === following.id) continue;
-      if (Math.random() < 0.5) {
-        await prisma.follow.create({
-          data: { followerId: follower.id, followingId: following.id },
-        });
-      }
-    }
+  // Deterministic follow graph: each user follows the next two (cyclic).
+  // alice does NOT follow bob — keeps e2e follow scenario reproducible.
+  const follows = [
+    ["alice", "carol"],
+    ["alice", "dave"],
+    ["bob", "alice"],
+    ["bob", "carol"],
+    ["carol", "dave"],
+    ["carol", "eve"],
+    ["dave", "eve"],
+    ["dave", "alice"],
+    ["eve", "alice"],
+    ["eve", "bob"],
+  ];
+  const byName = new Map(users.map((u) => [u.name, u]));
+  for (const [followerName, followingName] of follows) {
+    const follower = byName.get(followerName)!;
+    const following = byName.get(followingName)!;
+    await prisma.follow.create({
+      data: { followerId: follower.id, followingId: following.id },
+    });
   }
 
   console.log(`Seeded: ${users.length} users, ${posts.length} posts`);

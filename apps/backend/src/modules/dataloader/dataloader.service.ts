@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import DataLoader from "dataloader";
-import { Comment, User } from "@prisma/client";
+import type { Comment, User } from "../../../prisma/generated/client";
 import { PrismaService } from "../prisma/prisma.service";
 
 export interface RequestLoaders {

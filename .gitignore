@@ -22,6 +22,7 @@ pnpm-debug.log*
 
 # generated
 apps/frontend/src/generated
+apps/backend/prisma/generated
 
 # claude
 .claude_sessions/

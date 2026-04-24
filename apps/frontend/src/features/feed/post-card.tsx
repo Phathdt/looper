@@ -33,7 +33,7 @@ export function PostCard({ post }: PostCardProps) {
   const { mutate: addComment, isPending } = useAddCommentMutation({
     onSuccess: () => {
       setCommentText("");
-      queryClient.invalidateQueries(["Feed.infinite"]);
+      queryClient.invalidateQueries({ queryKey: ["Feed.infinite"] });
     },
   });
 

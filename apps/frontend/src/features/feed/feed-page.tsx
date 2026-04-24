@@ -10,9 +10,10 @@ export function FeedPage() {
     useInfiniteFeedQuery(
       { first: 10 },
       {
+        initialPageParam: { first: 10 },
         getNextPageParam: (lastPage: FeedQuery) =>
           lastPage.feed.pageInfo.hasNextPage
-            ? { after: lastPage.feed.pageInfo.endCursor }
+            ? { first: 10, after: lastPage.feed.pageInfo.endCursor }
             : undefined,
       },
     );

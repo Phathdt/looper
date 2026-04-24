@@ -3,7 +3,7 @@ import { authStore } from "./auth-store";
 const GRAPHQL_ENDPOINT = import.meta.env.VITE_GRAPHQL_ENDPOINT ?? "http://localhost:4000/graphql";
 
 export const fetcher = <TData, TVariables>(
-  query: string,
+  query: string | { toString(): string },
   variables?: TVariables,
   headers?: HeadersInit,
 ): (() => Promise<TData>) => {
@@ -16,7 +16,7 @@ export const fetcher = <TData, TVariables>(
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
-      body: JSON.stringify({ query, variables }),
+      body: JSON.stringify({ query: String(query), variables }),
     });
 
     const json = await res.json();

@@ -43,20 +43,20 @@ describe("<LoginPage />", () => {
 
   it("submits with entered credentials", async () => {
     renderPage();
-    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.c");
+    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.co");
     await userEvent.type(screen.getByPlaceholderText(/password/i), "pw12345");
     await userEvent.click(screen.getByRole("button", { name: /sign in/i }));
-    expect(mutate).toHaveBeenCalledWith({ input: { email: "a@b.c", password: "pw12345" } });
+    expect(mutate).toHaveBeenCalledWith({ input: { email: "a@b.co", password: "pw12345" } });
   });
 
   it("persists auth and navigates home on success", async () => {
     renderPage();
-    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.c");
+    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.co");
     await userEvent.type(screen.getByPlaceholderText(/password/i), "pw12345");
     await userEvent.click(screen.getByRole("button", { name: /sign in/i }));
 
     mutationOptions.onSuccess?.({
-      login: { token: "tok", user: { id: "1", name: "a", email: "a@b.c" } },
+      login: { token: "tok", user: { id: "1", name: "a", email: "a@b.co" } },
     });
     expect(authStore.getState().token).toBe("tok");
     expect(await screen.findByText("HOME")).toBeInTheDocument();
@@ -64,7 +64,7 @@ describe("<LoginPage />", () => {
 
   it("shows error message on failure", async () => {
     renderPage();
-    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.c");
+    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.co");
     await userEvent.type(screen.getByPlaceholderText(/password/i), "pw12345");
     await userEvent.click(screen.getByRole("button", { name: /sign in/i }));
     mutationOptions.onError?.(new Error("Invalid credentials"));
@@ -73,7 +73,7 @@ describe("<LoginPage />", () => {
 
   it("falls back to generic error when err is not Error", async () => {
     renderPage();
-    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.c");
+    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.co");
     await userEvent.type(screen.getByPlaceholderText(/password/i), "pw12345");
     await userEvent.click(screen.getByRole("button", { name: /sign in/i }));
     mutationOptions.onError?.("oops" as unknown as Error);

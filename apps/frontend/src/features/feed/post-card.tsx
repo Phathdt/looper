@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useAddCommentMutation, type FeedQuery } from "@/generated/graphql";
+import type { FeedQuery } from "@/generated/graphql";
+import { formatRelativeTime } from "@/lib/format";
+import { useAddComment } from "@/features/post/hooks/use-add-comment";
 
 type PostNode = FeedQuery["feed"]["edges"][number]["node"];
 
@@ -13,36 +14,14 @@ interface PostCardProps {
   post: PostNode;
 }
 
-function formatRelativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
 export function PostCard({ post }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
-  const [commentText, setCommentText] = useState("");
-  const queryClient = useQueryClient();
+  const { form, submit, isPending } = useAddComment(post.id);
+  const {
+    register,
+    formState: { isValid },
+  } = form;
   const commentCount = post.comments.length;
-
-  const { mutate: addComment, isPending } = useAddCommentMutation({
-    onSuccess: () => {
-      setCommentText("");
-      queryClient.invalidateQueries({ queryKey: ["Feed.infinite"] });
-    },
-  });
-
-  function handleSubmitComment(e: React.FormEvent) {
-    e.preventDefault();
-    const content = commentText.trim();
-    if (!content) return;
-    addComment({ postId: post.id, content });
-  }
 
   return (
     <Card data-testid="post-card">
@@ -101,14 +80,13 @@ export function PostCard({ post }: PostCardProps) {
               <p className="text-xs text-muted-foreground border-t pt-3">No comments yet.</p>
             )}
 
-            <form onSubmit={handleSubmitComment} className="flex gap-2 pt-2">
+            <form onSubmit={submit} className="flex gap-2 pt-2" noValidate>
               <Input
                 placeholder="Add a comment…"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
                 aria-label="Add a comment"
+                {...register("text")}
               />
-              <Button type="submit" size="sm" disabled={isPending || !commentText.trim()}>
+              <Button type="submit" size="sm" disabled={isPending || !isValid}>
                 {isPending ? "…" : "Send"}
               </Button>
             </form>

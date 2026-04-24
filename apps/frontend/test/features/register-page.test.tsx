@@ -37,23 +37,23 @@ describe("<RegisterPage />", () => {
   it("submits form with all fields", async () => {
     renderPage();
     await userEvent.type(screen.getByPlaceholderText(/^name$/i), "Alice");
-    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.c");
+    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.co");
     await userEvent.type(screen.getByPlaceholderText(/password/i), "pw12345");
     await userEvent.click(screen.getByRole("button", { name: /register|sign up|create/i }));
     expect(mutate).toHaveBeenCalledWith({
-      input: { name: "Alice", email: "a@b.c", password: "pw12345" },
+      input: { name: "Alice", email: "a@b.co", password: "pw12345" },
     });
   });
 
   it("persists auth and navigates on success", async () => {
     renderPage();
     await userEvent.type(screen.getByPlaceholderText(/^name$/i), "Alice");
-    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.c");
+    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.co");
     await userEvent.type(screen.getByPlaceholderText(/password/i), "pw12345");
     await userEvent.click(screen.getByRole("button", { name: /register|sign up|create/i }));
 
     mutationOptions.onSuccess?.({
-      register: { token: "tok", user: { id: "1", name: "Alice", email: "a@b.c" } },
+      register: { token: "tok", user: { id: "1", name: "Alice", email: "a@b.co" } },
     });
     expect(authStore.getState().token).toBe("tok");
     expect(await screen.findByText("HOME")).toBeInTheDocument();
@@ -62,7 +62,7 @@ describe("<RegisterPage />", () => {
   it("displays server error", async () => {
     renderPage();
     await userEvent.type(screen.getByPlaceholderText(/^name$/i), "A");
-    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.c");
+    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.co");
     await userEvent.type(screen.getByPlaceholderText(/password/i), "pw12345");
     await userEvent.click(screen.getByRole("button", { name: /register|sign up|create/i }));
     mutationOptions.onError?.(new Error("Email already registered"));
@@ -72,7 +72,7 @@ describe("<RegisterPage />", () => {
   it("falls back to generic error when err not Error", async () => {
     renderPage();
     await userEvent.type(screen.getByPlaceholderText(/^name$/i), "A");
-    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.c");
+    await userEvent.type(screen.getByPlaceholderText(/email/i), "a@b.co");
     await userEvent.type(screen.getByPlaceholderText(/password/i), "pw12345");
     await userEvent.click(screen.getByRole("button", { name: /register|sign up|create/i }));
     mutationOptions.onError?.("weird" as unknown as Error);

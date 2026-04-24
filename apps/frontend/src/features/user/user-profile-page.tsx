@@ -1,21 +1,10 @@
 import { useParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
-import { useUserQuery, useFollowMutation, useUnfollowMutation } from "@/generated/graphql";
-import { authStore } from "@/lib/auth-store";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-
-function formatRelativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
-}
+import { formatRelativeTime } from "@/lib/format";
+import { useUserProfile } from "./hooks/use-user-profile";
 
 function ProfileSkeleton() {
   return (
@@ -38,22 +27,8 @@ function ProfileSkeleton() {
 
 export function UserProfilePage() {
   const { id } = useParams<{ id: string }>();
-  const queryClient = useQueryClient();
-  const currentUser = authStore((state) => state.user);
-
-  const { data, isLoading, error } = useUserQuery({ id: id ?? "" }, { enabled: Boolean(id) });
-
-  const { mutate: follow, isPending: isFollowing } = useFollowMutation({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["User"] });
-    },
-  });
-
-  const { mutate: unfollow, isPending: isUnfollowing } = useUnfollowMutation({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["User"] });
-    },
-  });
+  const { user, isLoading, error, isSelf, mutating, isFollowing, isUnfollowing, follow, unfollow } =
+    useUserProfile(id);
 
   if (isLoading) {
     return (
@@ -63,7 +38,7 @@ export function UserProfilePage() {
     );
   }
 
-  if (error || !data) {
+  if (error || !user) {
     return (
       <div className="max-w-xl mx-auto px-4 py-6">
         <p className="text-sm text-destructive" role="alert">
@@ -73,13 +48,8 @@ export function UserProfilePage() {
     );
   }
 
-  const { user } = data;
-  const isSelf = currentUser?.id === user.id;
-  const mutating = isFollowing || isUnfollowing;
-
   return (
     <div className="max-w-xl mx-auto px-4 py-6 flex flex-col gap-6">
-      {/* Profile header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Avatar name={user.name} className="h-16 w-16 text-2xl" />
@@ -95,16 +65,11 @@ export function UserProfilePage() {
         {!isSelf && (
           <div>
             {user.isFollowing ? (
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={mutating}
-                onClick={() => unfollow({ userId: user.id })}
-              >
+              <Button variant="outline" size="sm" disabled={mutating} onClick={unfollow}>
                 {isUnfollowing ? "Unfollowing…" : "Unfollow"}
               </Button>
             ) : (
-              <Button size="sm" disabled={mutating} onClick={() => follow({ userId: user.id })}>
+              <Button size="sm" disabled={mutating} onClick={follow}>
                 {isFollowing ? "Following…" : "Follow"}
               </Button>
             )}
@@ -112,7 +77,6 @@ export function UserProfilePage() {
         )}
       </div>
 
-      {/* Posts list */}
       <div className="flex flex-col gap-3">
         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Posts</h3>
         {user.posts.length === 0 ? (

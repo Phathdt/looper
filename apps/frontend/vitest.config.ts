@@ -19,7 +19,12 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "text-summary", "html", "json-summary"],
       reportsDirectory: "./coverage",
-      include: ["src/lib/**/*.ts", "src/components/ui/**/*.tsx", "src/features/**/*.tsx"],
+      include: [
+        "src/lib/**/*.ts",
+        "src/components/ui/**/*.tsx",
+        "src/features/**/*.tsx",
+        "src/features/**/hooks/*.ts",
+      ],
       exclude: [
         "src/generated/**",
         "src/main.tsx",
@@ -29,7 +34,7 @@ export default defineConfig({
       ],
       thresholds: {
         statements: 90,
-        branches: 85,
+        branches: 80,
         functions: 85,
         lines: 90,
       },

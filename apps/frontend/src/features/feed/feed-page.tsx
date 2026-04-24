@@ -1,39 +1,9 @@
-import { useEffect, useRef } from "react";
-import { useInfiniteFeedQuery, type FeedQuery } from "@/generated/graphql";
 import { PostCard } from "./post-card";
 import { FeedSkeleton } from "./feed-skeleton";
+import { useFeed } from "./hooks/use-feed";
 
 export function FeedPage() {
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error } =
-    useInfiniteFeedQuery(
-      { first: 10 },
-      {
-        initialPageParam: { first: 10 },
-        getNextPageParam: (lastPage: FeedQuery) =>
-          lastPage.feed.pageInfo.hasNextPage
-            ? { first: 10, after: lastPage.feed.pageInfo.endCursor }
-            : undefined,
-      },
-    );
-
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { rootMargin: "200px" },
-    );
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  const { sentinelRef, posts, isLoading, isFetchingNextPage, hasNextPage, error } = useFeed();
 
   if (isLoading) {
     return (
@@ -53,8 +23,6 @@ export function FeedPage() {
     );
   }
 
-  const posts = data?.pages.flatMap((page) => page.feed.edges) ?? [];
-
   return (
     <div className="max-w-xl mx-auto px-4 py-6">
       {posts.length === 0 ? (
@@ -69,13 +37,11 @@ export function FeedPage() {
         </div>
       )}
 
-      {/* Infinite scroll sentinel */}
       <div ref={sentinelRef} className="h-1" aria-hidden="true" />
 
       {isFetchingNextPage && (
         <p className="text-sm text-muted-foreground text-center py-4">Loading more…</p>
       )}
-
       {!hasNextPage && posts.length > 0 && (
         <p className="text-sm text-muted-foreground text-center py-4">All caught up.</p>
       )}

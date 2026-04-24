@@ -1,34 +1,15 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useRegisterMutation } from "@/generated/graphql";
-import { authStore } from "@/lib/auth-store";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useRegister } from "./hooks/use-register";
 
 export function RegisterPage() {
-  const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  const { mutate, isPending } = useRegisterMutation({
-    onSuccess: (data) => {
-      const { token, user } = data.register;
-      authStore.getState().setAuth(token, user);
-      navigate("/");
-    },
-    onError: (err) => {
-      setError(err instanceof Error ? err.message : "Registration failed");
-    },
-  });
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    mutate({ input: { name, email, password } });
-  }
+  const { form, submit, isPending, serverError } = useRegister();
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -38,34 +19,46 @@ export function RegisterPage() {
           <p className="text-sm text-muted-foreground text-center">Create your account</p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <Input
-              type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              autoComplete="name"
-            />
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="new-password"
-            />
-            {error && (
+          <form onSubmit={submit} className="flex flex-col gap-3" noValidate>
+            <div>
+              <Input
+                type="text"
+                placeholder="Name"
+                autoComplete="name"
+                aria-invalid={Boolean(errors.name)}
+                {...register("name")}
+              />
+              {errors.name && (
+                <p className="text-xs text-destructive mt-1">{errors.name.message}</p>
+              )}
+            </div>
+            <div>
+              <Input
+                type="email"
+                placeholder="Email"
+                autoComplete="email"
+                aria-invalid={Boolean(errors.email)}
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="text-xs text-destructive mt-1">{errors.email.message}</p>
+              )}
+            </div>
+            <div>
+              <Input
+                type="password"
+                placeholder="Password"
+                autoComplete="new-password"
+                aria-invalid={Boolean(errors.password)}
+                {...register("password")}
+              />
+              {errors.password && (
+                <p className="text-xs text-destructive mt-1">{errors.password.message}</p>
+              )}
+            </div>
+            {serverError && (
               <p className="text-sm text-destructive" role="alert">
-                {error}
+                {serverError}
               </p>
             )}
             <Button type="submit" disabled={isPending}>

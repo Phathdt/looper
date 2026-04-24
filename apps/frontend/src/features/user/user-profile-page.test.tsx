@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Routes, Route } from "react-router-dom";
-import { renderWithProviders } from "../test-utils";
+import { renderWithProviders } from "@test/test-utils";
 
 type UserData = {
   user: {

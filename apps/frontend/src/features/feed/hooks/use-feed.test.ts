@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
-import { createWrapper } from "../test-utils";
+import { createWrapper } from "@test/test-utils";
 
 const fetchNextPage = vi.fn();
 let queryState = {

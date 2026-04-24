@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { createWrapper } from "../test-utils";
+import { createWrapper } from "@test/test-utils";
 import { authStore } from "@/lib/auth-store";
 
 let userQueryResult = {

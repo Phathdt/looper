@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
-    include: ["test/**/*.spec.ts", "test/**/*.test.ts"],
+    include: ["src/**/*.spec.ts", "src/**/*.test.ts", "test/**/*.spec.ts", "test/**/*.test.ts"],
     testTimeout: 60_000,
     hookTimeout: 120_000,
     pool: "forks",
@@ -19,6 +19,8 @@ export default defineConfig({
       reportsDirectory: "./coverage",
       include: ["src/modules/**/*.ts"],
       exclude: [
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts",
         "src/**/*.module.ts",
         "src/**/*.model.ts",
         "src/**/*.models.ts",

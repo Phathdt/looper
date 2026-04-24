@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach, vi } from "vitest";
-import { FeedService } from "../../src/modules/feed/feed.service";
-import { decodeCursor, encodeCursor } from "../../src/modules/feed/feed.cursor";
-import type { PrismaService } from "../../src/modules/prisma/prisma.service";
+import { FeedService } from "./feed.service";
+import { decodeCursor, encodeCursor } from "./feed.cursor";
+import type { PrismaService } from "../prisma/prisma.service";
 
 const makePost = (i: number) => ({
   id: `p${i}`,

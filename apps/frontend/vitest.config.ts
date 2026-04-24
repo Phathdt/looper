@@ -7,13 +7,14 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@test": path.resolve(__dirname, "./test"),
     },
   },
   test: {
     globals: true,
     environment: "jsdom",
     setupFiles: ["./test/setup.ts"],
-    include: ["test/**/*.{test,spec}.{ts,tsx}"],
+    include: ["src/**/*.{test,spec}.{ts,tsx}", "test/**/*.{test,spec}.{ts,tsx}"],
     css: false,
     coverage: {
       provider: "v8",
@@ -31,6 +32,7 @@ export default defineConfig({
         "src/app.tsx",
         "src/router.tsx",
         "src/vite-env.d.ts",
+        "src/**/*.{test,spec}.{ts,tsx}",
       ],
       thresholds: {
         statements: 90,

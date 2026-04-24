@@ -40,11 +40,9 @@ describe("fetcher", () => {
   });
 
   it("throws on GraphQL errors", async () => {
-    global.fetch = vi
-      .fn()
-      .mockResolvedValue({
-        json: async () => ({ errors: [{ message: "Boom" }] }),
-      }) as unknown as typeof fetch;
+    global.fetch = vi.fn().mockResolvedValue({
+      json: async () => ({ errors: [{ message: "Boom" }] }),
+    }) as unknown as typeof fetch;
 
     await expect(fetcher("{}")()).rejects.toThrow("Boom");
   });

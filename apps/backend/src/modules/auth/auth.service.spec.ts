@@ -2,8 +2,8 @@ import { describe, expect, it, beforeEach, vi } from "vitest";
 import { ConflictException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import bcrypt from "bcryptjs";
-import { AuthService } from "../../src/modules/auth/auth.service";
-import type { PrismaService } from "../../src/modules/prisma/prisma.service";
+import { AuthService } from "./auth.service";
+import type { PrismaService } from "../prisma/prisma.service";
 
 function makeService() {
   const prisma = {

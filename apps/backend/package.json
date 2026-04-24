@@ -8,7 +8,7 @@
     "start": "node dist/main.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:unit": "vitest run test/unit",
+    "test:unit": "vitest run src/",
     "test:integration": "vitest run test/integration",
     "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit",

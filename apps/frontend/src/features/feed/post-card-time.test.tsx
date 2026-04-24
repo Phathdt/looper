@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
-import { renderWithProviders } from "../test-utils";
+import { renderWithProviders } from "@test/test-utils";
 
 vi.mock("@/generated/graphql", () => ({
   useAddCommentMutation: () => ({ mutate: vi.fn(), isPending: false }),

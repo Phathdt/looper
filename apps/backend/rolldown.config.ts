@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 import { defineConfig } from 'rolldown'
 
 export default defineConfig({
@@ -9,5 +11,12 @@ export default defineConfig({
     sourcemap: true,
   },
   platform: 'node',
-  external: (id) => !id.startsWith('.') && !id.startsWith('/'),
+  resolve: {
+    alias: {
+      '@modules': path.resolve(__dirname, 'src/modules'),
+      '@common': path.resolve(__dirname, 'src/common'),
+    },
+  },
+  external: (id) =>
+    !id.startsWith('.') && !id.startsWith('/') && !id.startsWith('@modules') && !id.startsWith('@common'),
 })

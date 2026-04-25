@@ -1,6 +1,5 @@
+import { Post } from '@modules/post'
 import { Field, ObjectType } from '@nestjs/graphql'
-
-import { Post } from '../../../post/domain/entities/post.entity'
 
 @ObjectType()
 export class PageInfo {

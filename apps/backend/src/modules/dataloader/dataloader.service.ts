@@ -1,11 +1,11 @@
+import { CommentRepository } from '@modules/comment'
+import { FollowRepository } from '@modules/follow'
+import { UserRepository } from '@modules/user'
 import { Injectable } from '@nestjs/common'
 
 import DataLoader from 'dataloader'
 
 import type { Comment, User } from '../../../prisma/generated/client'
-import { CommentRepository } from '../comment/domain/interfaces/comment.repository'
-import { FollowRepository } from '../follow/domain/interfaces/follow.repository'
-import { UserRepository } from '../user/domain/interfaces/user.repository'
 
 export interface RequestLoaders {
   userById: DataLoader<string, User | null>

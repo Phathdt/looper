@@ -3,6 +3,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "@modules/*": ["src/modules/*"],
+      "@common/*": ["src/common/*"]
+    },
     "sourceMap": true,
     "strictNullChecks": true,
     "noImplicitAny": false,

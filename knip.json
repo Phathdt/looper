@@ -1,0 +1,44 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["docker-compose.yml", "lefthook.yml", "turbo.json", ".lintstagedrc.json"]
+    },
+    "packages/tsconfig": {
+      "entry": ["base.json", "nest.json", "react.json", "node.json"],
+      "ignoreDependencies": ["ts-node"]
+    },
+    "apps/backend": {
+      "entry": ["src/main.ts", "prisma/seed.ts", "rolldown.config.ts", "src/**/*.{spec,test}.ts"],
+      "project": ["src/**/*.ts", "prisma/**/*.ts", "*.config.ts"],
+      "ignoreDependencies": [
+        "@as-integrations/express5",
+        "@oxc-project/runtime",
+        "@prisma/client",
+        "pg",
+        "pino-pretty",
+        "ts-node",
+        "@types/bcryptjs",
+        "@types/pg"
+      ],
+      "ignoreBinaries": ["ts-node"]
+    },
+    "apps/frontend": {
+      "entry": ["index.html", "src/**/*.{test,spec}.{ts,tsx}"],
+      "project": ["src/**/*.{ts,tsx}", "test/**/*.{ts,tsx}"],
+      "ignoreDependencies": ["tailwindcss"]
+    },
+    "apps/e2e": {
+      "entry": [
+        ".cucumber.js",
+        "tests/features/**/*.steps.ts",
+        "tests/support/**/*.ts",
+        "config/**/*.ts",
+        "page-objects/**/*.ts",
+        "utils/**/*.ts"
+      ],
+      "project": ["**/*.ts"],
+      "ignoreDependencies": ["pino-pretty", "ts-node"]
+    }
+  }
+}

@@ -1,7 +1,7 @@
+import type { GqlContext } from '@common/graphql/gql-context'
+import { Post } from '@modules/post'
 import { Args, Context, ID, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 
-import type { GqlContext } from '../../../../common/graphql/gql-context'
-import { Post } from '../../../post/domain/entities/post.entity'
 import { UserService } from '../../application/services/user.service'
 import { User } from '../../domain/entities/user.entity'
 

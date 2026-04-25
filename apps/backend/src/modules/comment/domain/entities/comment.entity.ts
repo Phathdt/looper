@@ -1,6 +1,5 @@
+import { User } from '@modules/user'
 import { Field, ID, ObjectType } from '@nestjs/graphql'
-
-import { User } from '../../../user/domain/entities/user.entity'
 
 @ObjectType()
 export class Comment {

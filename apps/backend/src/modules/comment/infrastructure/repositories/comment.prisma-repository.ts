@@ -1,7 +1,7 @@
+import { PrismaService } from '@modules/prisma'
 import { Injectable } from '@nestjs/common'
 
 import type { Comment as PrismaComment } from '../../../../../prisma/generated/client'
-import { PrismaService } from '../../../prisma/prisma.service'
 import { CommentRepository } from '../../domain/interfaces/comment.repository'
 
 @Injectable()

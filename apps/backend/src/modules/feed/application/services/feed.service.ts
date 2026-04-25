@@ -1,7 +1,7 @@
+import { FollowRepository } from '@modules/follow'
+import { PostRepository } from '@modules/post'
 import { Injectable } from '@nestjs/common'
 
-import { FollowRepository } from '../../../follow/domain/interfaces/follow.repository'
-import { PostRepository } from '../../../post/domain/interfaces/post.repository'
 import { decodeCursor, encodeCursor } from '../../domain/feed-cursor'
 
 @Injectable()

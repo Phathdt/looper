@@ -1,0 +1,26 @@
+{
+  "directory": [
+    "./apps/backend/src/modules/auth",
+    "./apps/backend/src/modules/user",
+    "./apps/backend/src/modules/post",
+    "./apps/backend/src/modules/comment",
+    "./apps/backend/src/modules/follow",
+    "./apps/backend/src/modules/feed",
+    "./apps/backend/src/modules/dataloader",
+    "./apps/backend/src/modules/prisma"
+  ],
+  "exclude": [
+    "\\.spec\\.ts$",
+    "\\.integration\\.spec\\.ts$",
+    "\\.test\\.ts$",
+    "\\.module\\.ts$",
+    "/infrastructure/repositories/.*\\.prisma-repository\\.ts$",
+    "/infrastructure/resolvers/.*\\.resolver\\.ts$"
+  ],
+  "delete": true,
+  "noSemicolon": true,
+  "singleQuotes": true,
+  "location": "top",
+  "structure": "flat",
+  "name": "index"
+}

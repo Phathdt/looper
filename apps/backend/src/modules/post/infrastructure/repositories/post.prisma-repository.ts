@@ -1,8 +1,8 @@
+import type { FeedCursor } from '@modules/feed'
+import { PrismaService } from '@modules/prisma'
 import { Injectable } from '@nestjs/common'
 
 import type { Post as PrismaPost } from '../../../../../prisma/generated/client'
-import type { FeedCursor } from '../../../feed/domain/feed-cursor'
-import { PrismaService } from '../../../prisma/prisma.service'
 import { PostRepository } from '../../domain/interfaces/post.repository'
 
 @Injectable()

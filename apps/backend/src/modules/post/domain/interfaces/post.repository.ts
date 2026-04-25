@@ -1,5 +1,6 @@
+import type { FeedCursor } from '@modules/feed'
+
 import type { Post as PrismaPost } from '../../../../../prisma/generated/client'
-import type { FeedCursor } from '../../../feed/domain/feed-cursor'
 
 export abstract class PostRepository {
   abstract findById(id: string): Promise<PrismaPost | null>

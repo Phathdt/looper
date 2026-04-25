@@ -1,11 +1,10 @@
+import type { GqlContext } from '@common/graphql/gql-context'
+import { CurrentUser, GqlAuthGuard, type AuthUser } from '@modules/auth'
+import { Comment } from '@modules/comment'
+import { User } from '@modules/user'
 import { UseGuards } from '@nestjs/common'
 import { Args, Context, Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql'
 
-import type { GqlContext } from '../../../../common/graphql/gql-context'
-import { CurrentUser, type AuthUser } from '../../../auth/infrastructure/current-user.decorator'
-import { GqlAuthGuard } from '../../../auth/infrastructure/gql-auth.guard'
-import { Comment } from '../../../comment/domain/entities/comment.entity'
-import { User } from '../../../user/domain/entities/user.entity'
 import { PostService } from '../../application/services/post.service'
 import { Post } from '../../domain/entities/post.entity'
 

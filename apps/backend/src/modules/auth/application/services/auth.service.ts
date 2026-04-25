@@ -1,9 +1,9 @@
+import { UserRepository } from '@modules/user'
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 
 import bcrypt from 'bcryptjs'
 
-import { UserRepository } from '../../../user/domain/interfaces/user.repository'
 import { LoginInput } from '../../domain/dto/login.input'
 import { RegisterInput } from '../../domain/dto/register.input'
 import { EmailAlreadyRegisteredError, InvalidCredentialsError } from '../../domain/errors'

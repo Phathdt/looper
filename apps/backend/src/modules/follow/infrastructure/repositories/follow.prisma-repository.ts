@@ -1,6 +1,6 @@
+import { PrismaService } from '@modules/prisma'
 import { Injectable } from '@nestjs/common'
 
-import { PrismaService } from '../../../prisma/prisma.service'
 import { FollowRepository } from '../../domain/interfaces/follow.repository'
 
 @Injectable()

@@ -1,19 +1,7 @@
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql";
-import { z } from "zod";
-
-export const userEntitySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  email: z.string(),
-  createdAt: z.date(),
-  followersCount: z.number().int(),
-  isFollowing: z.boolean(),
-});
-
-export type UserEntityType = z.infer<typeof userEntitySchema>;
 
 @ObjectType()
-export class User implements UserEntityType {
+export class User {
   @Field(() => ID)
   id!: string;
 

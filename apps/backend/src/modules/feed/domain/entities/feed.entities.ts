@@ -1,16 +1,8 @@
 import { Field, ObjectType } from "@nestjs/graphql";
-import { z } from "zod";
-import { Post, postEntitySchema } from "../../../post/domain/entities/post.entity";
-
-export const pageInfoSchema = z.object({
-  hasNextPage: z.boolean(),
-  endCursor: z.string().nullable().optional(),
-});
-
-export type PageInfoType = z.infer<typeof pageInfoSchema>;
+import { Post } from "../../../post/domain/entities/post.entity";
 
 @ObjectType()
-export class PageInfo implements PageInfoType {
+export class PageInfo {
   @Field()
   hasNextPage!: boolean;
 
@@ -18,15 +10,8 @@ export class PageInfo implements PageInfoType {
   endCursor?: string | null;
 }
 
-export const postEdgeSchema = z.object({
-  cursor: z.string(),
-  node: postEntitySchema,
-});
-
-export type PostEdgeType = z.infer<typeof postEdgeSchema>;
-
 @ObjectType()
-export class PostEdge implements PostEdgeType {
+export class PostEdge {
   @Field()
   cursor!: string;
 
@@ -34,15 +19,8 @@ export class PostEdge implements PostEdgeType {
   node!: Post;
 }
 
-export const postConnectionSchema = z.object({
-  edges: z.array(postEdgeSchema),
-  pageInfo: pageInfoSchema,
-});
-
-export type PostConnectionType = z.infer<typeof postConnectionSchema>;
-
 @ObjectType()
-export class PostConnection implements PostConnectionType {
+export class PostConnection {
   @Field(() => [PostEdge])
   edges!: PostEdge[];
 

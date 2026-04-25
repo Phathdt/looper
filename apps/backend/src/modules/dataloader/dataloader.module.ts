@@ -1,8 +1,9 @@
-import { Global, Module } from "@nestjs/common";
-import { DataLoaderService } from "./dataloader.service";
-import { UserModule } from "../user/user.module";
-import { CommentModule } from "../comment/comment.module";
-import { FollowModule } from "../follow/follow.module";
+import { Global, Module } from '@nestjs/common'
+
+import { CommentModule } from '../comment/comment.module'
+import { FollowModule } from '../follow/follow.module'
+import { UserModule } from '../user/user.module'
+import { DataLoaderService } from './dataloader.service'
 
 @Global()
 @Module({

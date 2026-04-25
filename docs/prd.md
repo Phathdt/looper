@@ -350,7 +350,7 @@ pnpm --filter frontend generate
 ### Example Usage
 
 ```ts
-const { data, isLoading } = useFeedQuery();
+const { data, isLoading } = useFeedQuery()
 ```
 
 ---

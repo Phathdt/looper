@@ -1,17 +1,18 @@
-import { Field, ID, ObjectType } from "@nestjs/graphql";
-import { User } from "../../../user/domain/entities/user.entity";
+import { Field, ID, ObjectType } from '@nestjs/graphql'
+
+import { User } from '../../../user/domain/entities/user.entity'
 
 @ObjectType()
 export class Comment {
   @Field(() => ID)
-  id!: string;
+  id!: string
 
   @Field()
-  content!: string;
+  content!: string
 
   @Field()
-  createdAt!: Date;
+  createdAt!: Date
 
   @Field(() => User)
-  author!: User;
+  author!: User
 }

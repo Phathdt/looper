@@ -1,22 +1,22 @@
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql";
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql'
 
 @ObjectType()
 export class User {
   @Field(() => ID)
-  id!: string;
+  id!: string
 
   @Field()
-  name!: string;
+  name!: string
 
   @Field()
-  email!: string;
+  email!: string
 
   @Field()
-  createdAt!: Date;
+  createdAt!: Date
 
   @Field(() => Int)
-  followersCount!: number;
+  followersCount!: number
 
   @Field()
-  isFollowing!: boolean;
+  isFollowing!: boolean
 }

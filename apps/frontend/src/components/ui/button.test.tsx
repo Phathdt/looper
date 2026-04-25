@@ -1,29 +1,31 @@
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { Button } from "@/components/ui/button";
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
-describe("<Button />", () => {
-  it("renders children", () => {
-    render(<Button>Click me</Button>);
-    expect(screen.getByRole("button", { name: /click me/i })).toBeInTheDocument();
-  });
+import { Button } from '@/components/ui/button'
 
-  it("fires onClick", async () => {
-    const onClick = vi.fn();
-    render(<Button onClick={onClick}>Go</Button>);
-    await userEvent.click(screen.getByRole("button"));
-    expect(onClick).toHaveBeenCalledOnce();
-  });
+import { describe, expect, it, vi } from 'vitest'
 
-  it("applies variant classes", () => {
-    render(<Button variant="destructive">Delete</Button>);
-    const btn = screen.getByRole("button");
-    expect(btn.className).toMatch(/destructive/);
-  });
+describe('<Button />', () => {
+  it('renders children', () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument()
+  })
 
-  it("disables when disabled prop set", () => {
-    render(<Button disabled>Nope</Button>);
-    expect(screen.getByRole("button")).toBeDisabled();
-  });
-});
+  it('fires onClick', async () => {
+    const onClick = vi.fn()
+    render(<Button onClick={onClick}>Go</Button>)
+    await userEvent.click(screen.getByRole('button'))
+    expect(onClick).toHaveBeenCalledOnce()
+  })
+
+  it('applies variant classes', () => {
+    render(<Button variant='destructive'>Delete</Button>)
+    const btn = screen.getByRole('button')
+    expect(btn.className).toMatch(/destructive/)
+  })
+
+  it('disables when disabled prop set', () => {
+    render(<Button disabled>Nope</Button>)
+    expect(screen.getByRole('button')).toBeDisabled()
+  })
+})

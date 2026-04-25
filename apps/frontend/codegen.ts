@@ -1,4 +1,4 @@
-import type { CodegenConfig } from "@graphql-codegen/cli";
+import type { CodegenConfig } from '@graphql-codegen/cli'
 
 const typedDocumentStringClass = `
 export class TypedDocumentString<TResult, TVariables> extends String {
@@ -10,32 +10,32 @@ export class TypedDocumentString<TResult, TVariables> extends String {
     return this as unknown as string;
   }
 }
-`;
+`
 
 const config: CodegenConfig = {
-  schema: "http://localhost:4000/graphql",
-  documents: ["src/**/*.graphql"],
+  schema: 'http://localhost:4000/graphql',
+  documents: ['src/**/*.graphql'],
   generates: {
-    "src/generated/graphql.ts": {
+    'src/generated/graphql.ts': {
       plugins: [
         { add: { content: typedDocumentStringClass } },
-        "typescript",
-        "typescript-operations",
-        "typescript-react-query",
+        'typescript',
+        'typescript-operations',
+        'typescript-react-query',
       ],
       config: {
         fetcher: {
-          func: "@/lib/fetcher#fetcher",
+          func: '@/lib/fetcher#fetcher',
           isReactHook: false,
         },
         exposeQueryKeys: true,
         exposeFetcher: true,
         addInfiniteQuery: true,
         reactQueryVersion: 5,
-        documentMode: "string",
+        documentMode: 'string',
       },
     },
   },
-};
+}
 
-export default config;
+export default config

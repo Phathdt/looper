@@ -1,17 +1,20 @@
-import { describe, expect, it, vi } from "vitest";
-import { screen } from "@testing-library/react";
-import { renderWithProviders } from "@test/test-utils";
+import { renderWithProviders } from '@test/test-utils'
+import { screen } from '@testing-library/react'
+
+import { FeedPage } from '@/features/feed/feed-page'
+
+import { describe, expect, it, vi } from 'vitest'
 
 type HookResult = {
-  data?: { pages: Array<{ feed: { edges: Array<{ node: unknown; cursor: string }> } }> };
-  isLoading: boolean;
-  isFetchingNextPage: boolean;
-  hasNextPage: boolean;
-  fetchNextPage: () => void;
-  error: Error | null;
-};
+  data?: { pages: Array<{ feed: { edges: Array<{ node: unknown; cursor: string }> } }> }
+  isLoading: boolean
+  isFetchingNextPage: boolean
+  hasNextPage: boolean
+  fetchNextPage: () => void
+  error: Error | null
+}
 
-const fetchNextPage = vi.fn();
+const fetchNextPage = vi.fn()
 let state: HookResult = {
   isLoading: false,
   isFetchingNextPage: true,
@@ -24,13 +27,13 @@ let state: HookResult = {
         feed: {
           edges: [
             {
-              cursor: "c1",
+              cursor: 'c1',
               node: {
-                id: "p1",
-                content: "x",
+                id: 'p1',
+                content: 'x',
                 createdAt: new Date().toISOString(),
                 likesCount: 0,
-                author: { id: "u", name: "a" },
+                author: { id: 'u', name: 'a' },
                 comments: [],
               },
             },
@@ -39,47 +42,44 @@ let state: HookResult = {
       },
     ],
   },
-};
+}
 
-vi.mock("@/generated/graphql", () => ({
+vi.mock('@/generated/graphql', () => ({
   useInfiniteFeedQuery: () => state,
   useAddCommentMutation: () => ({ mutate: vi.fn(), isPending: false }),
-}));
+}))
 
-import { FeedPage } from "@/features/feed/feed-page";
-
-describe("<FeedPage /> more states", () => {
+describe('<FeedPage /> more states', () => {
   it("shows 'Loading more' indicator when fetching next page", () => {
-    renderWithProviders(<FeedPage />);
-    expect(screen.getByText(/loading more/i)).toBeInTheDocument();
-  });
+    renderWithProviders(<FeedPage />)
+    expect(screen.getByText(/loading more/i)).toBeInTheDocument()
+  })
 
-  it("triggers fetchNextPage when sentinel is intersected", () => {
-    const observerSpies: Array<(entries: IntersectionObserverEntry[]) => void> = [];
+  it('triggers fetchNextPage when sentinel is intersected', () => {
+    const observerSpies: Array<(entries: IntersectionObserverEntry[]) => void> = []
     class CapturingObserver {
       constructor(cb: (entries: IntersectionObserverEntry[]) => void) {
-        observerSpies.push(cb);
+        observerSpies.push(cb)
       }
       observe() {}
       disconnect() {}
       unobserve() {}
       takeRecords() {
-        return [];
+        return []
       }
-      root = null;
-      rootMargin = "";
-      thresholds = [];
+      root = null
+      rootMargin = ''
+      thresholds = []
     }
-    (
-      globalThis as unknown as { IntersectionObserver: typeof IntersectionObserver }
-    ).IntersectionObserver = CapturingObserver as unknown as typeof IntersectionObserver;
+    ;(globalThis as unknown as { IntersectionObserver: typeof IntersectionObserver }).IntersectionObserver =
+      CapturingObserver as unknown as typeof IntersectionObserver
 
-    fetchNextPage.mockReset();
-    state = { ...state, isFetchingNextPage: false };
-    renderWithProviders(<FeedPage />);
+    fetchNextPage.mockReset()
+    state = { ...state, isFetchingNextPage: false }
+    renderWithProviders(<FeedPage />)
 
     // Simulate intersection
-    observerSpies[0]([{ isIntersecting: true } as IntersectionObserverEntry]);
-    expect(fetchNextPage).toHaveBeenCalled();
-  });
-});
+    observerSpies[0]([{ isIntersecting: true } as IntersectionObserverEntry])
+    expect(fetchNextPage).toHaveBeenCalled()
+  })
+})

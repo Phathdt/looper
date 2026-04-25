@@ -1,24 +1,25 @@
-import { describe, expect, it } from "vitest";
-import { decodeCursor, encodeCursor } from "./domain/feed-cursor";
+import { describe, expect, it } from 'vitest'
 
-describe("feed cursor", () => {
-  it("encodes and decodes roundtrip", () => {
-    const post = { createdAt: new Date("2026-04-23T12:34:56.789Z"), id: "abc-123" };
-    const encoded = encodeCursor(post);
-    expect(typeof encoded).toBe("string");
+import { decodeCursor, encodeCursor } from './domain/feed-cursor'
 
-    const decoded = decodeCursor(encoded);
-    expect(decoded.id).toBe("abc-123");
-    expect(new Date(decoded.createdAt).toISOString()).toBe(post.createdAt.toISOString());
-  });
+describe('feed cursor', () => {
+  it('encodes and decodes roundtrip', () => {
+    const post = { createdAt: new Date('2026-04-23T12:34:56.789Z'), id: 'abc-123' }
+    const encoded = encodeCursor(post)
+    expect(typeof encoded).toBe('string')
 
-  it("throws on invalid cursor", () => {
-    expect(() => decodeCursor("not-base64")).toThrow();
-  });
+    const decoded = decodeCursor(encoded)
+    expect(decoded.id).toBe('abc-123')
+    expect(new Date(decoded.createdAt).toISOString()).toBe(post.createdAt.toISOString())
+  })
 
-  it("produces distinct cursors for different posts", () => {
-    const a = encodeCursor({ createdAt: new Date(), id: "a" });
-    const b = encodeCursor({ createdAt: new Date(), id: "b" });
-    expect(a).not.toBe(b);
-  });
-});
+  it('throws on invalid cursor', () => {
+    expect(() => decodeCursor('not-base64')).toThrow()
+  })
+
+  it('produces distinct cursors for different posts', () => {
+    const a = encodeCursor({ createdAt: new Date(), id: 'a' })
+    const b = encodeCursor({ createdAt: new Date(), id: 'b' })
+    expect(a).not.toBe(b)
+  })
+})

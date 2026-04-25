@@ -1,27 +1,28 @@
-import { Injectable } from "@nestjs/common";
-import type { Post as PrismaPost } from "../../../../../prisma/generated/client";
-import { PrismaService } from "../../../prisma/prisma.service";
-import { PostRepository } from "../../domain/interfaces/post.repository";
-import type { FeedCursor } from "../../../feed/domain/feed-cursor";
+import { Injectable } from '@nestjs/common'
+
+import type { Post as PrismaPost } from '../../../../../prisma/generated/client'
+import type { FeedCursor } from '../../../feed/domain/feed-cursor'
+import { PrismaService } from '../../../prisma/prisma.service'
+import { PostRepository } from '../../domain/interfaces/post.repository'
 
 @Injectable()
 export class PostPrismaRepository implements PostRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   findById(id: string): Promise<PrismaPost | null> {
-    return this.prisma.post.findUnique({ where: { id } });
+    return this.prisma.post.findUnique({ where: { id } })
   }
 
   create(authorId: string, content: string): Promise<PrismaPost> {
-    return this.prisma.post.create({ data: { authorId, content } });
+    return this.prisma.post.create({ data: { authorId, content } })
   }
 
   findByAuthor(authorId: string, first: number): Promise<PrismaPost[]> {
     return this.prisma.post.findMany({
       where: { authorId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       take: first,
-    });
+    })
   }
 
   findFeedPage(authorIds: string[], take: number, after?: FeedCursor): Promise<PrismaPost[]> {
@@ -35,8 +36,8 @@ export class PostPrismaRepository implements PostRepository {
           ],
         }),
       },
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take,
-    });
+    })
   }
 }

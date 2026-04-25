@@ -1,17 +1,18 @@
-import { describe, expect, it } from "vitest";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils'
 
-describe("cn()", () => {
-  it("merges simple classnames", () => {
-    expect(cn("a", "b")).toBe("a b");
-  });
+import { describe, expect, it } from 'vitest'
 
-  it("dedupes tailwind classes (last wins)", () => {
-    expect(cn("p-2", "p-4")).toBe("p-4");
-  });
+describe('cn()', () => {
+  it('merges simple classnames', () => {
+    expect(cn('a', 'b')).toBe('a b')
+  })
 
-  it("handles conditional classes", () => {
-    const show = false as boolean;
-    expect(cn("base", show && "hidden", "active")).toBe("base active");
-  });
-});
+  it('dedupes tailwind classes (last wins)', () => {
+    expect(cn('p-2', 'p-4')).toBe('p-4')
+  })
+
+  it('handles conditional classes', () => {
+    const show = false as boolean
+    expect(cn('base', show && 'hidden', 'active')).toBe('base active')
+  })
+})

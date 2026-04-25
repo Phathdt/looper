@@ -128,8 +128,8 @@ Use for:
 ### Hooks (generated)
 
 ```ts
-useFeedQuery();
-useCreatePostMutation();
+useFeedQuery()
+useCreatePostMutation()
 ```
 
 ---

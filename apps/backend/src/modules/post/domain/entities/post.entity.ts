@@ -1,24 +1,25 @@
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql";
-import { User } from "../../../user/domain/entities/user.entity";
-import { Comment } from "../../../comment/domain/entities/comment.entity";
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql'
+
+import { Comment } from '../../../comment/domain/entities/comment.entity'
+import { User } from '../../../user/domain/entities/user.entity'
 
 @ObjectType()
 export class Post {
   @Field(() => ID)
-  id!: string;
+  id!: string
 
   @Field()
-  content!: string;
+  content!: string
 
   @Field()
-  createdAt!: Date;
+  createdAt!: Date
 
   @Field(() => User)
-  author!: User;
+  author!: User
 
   @Field(() => [Comment])
-  comments!: Comment[];
+  comments!: Comment[]
 
   @Field(() => Int)
-  likesCount!: number;
+  likesCount!: number
 }

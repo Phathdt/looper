@@ -1,13 +1,21 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { IsEmail, MinLength } from "class-validator";
+import { z } from "zod";
+
+// Matches validator.js isEmail behavior (accepts short TLDs like x@x.x)
+const emailSchema = z.string().regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email");
+
+export const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(6),
+});
+
+export type LoginInputType = z.infer<typeof loginSchema>;
 
 @InputType()
-export class LoginInput {
+export class LoginInput implements LoginInputType {
   @Field()
-  @IsEmail()
   email!: string;
 
   @Field()
-  @MinLength(6)
   password!: string;
 }

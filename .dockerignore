@@ -1,0 +1,22 @@
+**/node_modules
+**/dist
+**/coverage
+**/.turbo
+**/.vite
+**/test-results
+**/.env
+**/.env.local
+**/.env.*.local
+**/.DS_Store
+**/*.log
+.git
+.github
+.vscode
+.idea
+.claude_sessions
+plans
+docs
+*.md
+!apps/frontend/nginx.conf
+apps/backend/prisma/generated
+# apps/frontend/src/generated  -- NEEDED for docker build (pre-generate via `pnpm --filter frontend generate`)

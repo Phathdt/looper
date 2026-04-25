@@ -1,9 +1,21 @@
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql";
-import { User } from "../../../user/domain/entities/user.entity";
-import { Comment } from "../../../comment/domain/entities/comment.entity";
+import { z } from "zod";
+import { User, userEntitySchema } from "../../../user/domain/entities/user.entity";
+import { Comment, commentEntitySchema } from "../../../comment/domain/entities/comment.entity";
+
+export const postEntitySchema = z.object({
+  id: z.string(),
+  content: z.string(),
+  createdAt: z.date(),
+  author: userEntitySchema,
+  comments: z.array(commentEntitySchema),
+  likesCount: z.number().int(),
+});
+
+export type PostEntityType = z.infer<typeof postEntitySchema>;
 
 @ObjectType()
-export class Post {
+export class Post implements PostEntityType {
   @Field(() => ID)
   id!: string;
 

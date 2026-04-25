@@ -8,6 +8,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false
   },
-  "include": ["src/**/*", "test/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,7 +1,8 @@
 import { describe, expect, it, beforeEach, vi } from "vitest";
-import { FeedService } from "./feed.service";
-import { decodeCursor, encodeCursor } from "./feed.cursor";
-import type { PrismaService } from "../prisma/prisma.service";
+import { FeedService } from "./application/services/feed.service";
+import { decodeCursor, encodeCursor } from "./domain/feed-cursor";
+import type { PostRepository } from "../post/domain/interfaces/post.repository";
+import type { FollowRepository } from "../follow/domain/interfaces/follow.repository";
 
 const makePost = (i: number) => ({
   id: `p${i}`,
@@ -11,11 +12,22 @@ const makePost = (i: number) => ({
 });
 
 function makeService(posts: ReturnType<typeof makePost>[]) {
-  const prisma = {
-    follow: { findMany: vi.fn(async () => []) },
-    post: { findMany: vi.fn(async () => posts) },
-  } as unknown as PrismaService;
-  return { service: new FeedService(prisma), prisma };
+  const postRepo = {
+    findFeedPage: vi.fn(async () => posts),
+    findById: vi.fn(),
+    create: vi.fn(),
+    findByAuthor: vi.fn(),
+  } as unknown as PostRepository;
+
+  const followRepo = {
+    listFollowingIds: vi.fn(async () => []),
+    follow: vi.fn(),
+    unfollow: vi.fn(),
+    countFollowers: vi.fn(),
+    isFollowingBatch: vi.fn(),
+  } as unknown as FollowRepository;
+
+  return { service: new FeedService(postRepo, followRepo), postRepo, followRepo };
 }
 
 describe("FeedService (unit)", () => {
@@ -44,20 +56,20 @@ describe("FeedService (unit)", () => {
   });
 
   it("clamps first to [1,50]", async () => {
-    const { service, prisma } = makeService([]);
+    const { service, postRepo } = makeService([]);
     await service.feed("u1", 0);
-    expect((prisma.post.findMany as ReturnType<typeof vi.fn>).mock.calls[0][0].take).toBe(2);
+    expect((postRepo.findFeedPage as ReturnType<typeof vi.fn>).mock.calls[0][1]).toBe(2);
 
     await service.feed("u1", 100);
-    expect((prisma.post.findMany as ReturnType<typeof vi.fn>).mock.calls[1][0].take).toBe(51);
+    expect((postRepo.findFeedPage as ReturnType<typeof vi.fn>).mock.calls[1][1]).toBe(51);
   });
 
-  it("passes decoded cursor as WHERE filter", async () => {
-    const { service, prisma } = makeService([]);
+  it("passes decoded cursor to findFeedPage", async () => {
+    const { service, postRepo } = makeService([]);
     const after = encodeCursor({ createdAt: new Date("2026-01-01T00:00:05Z"), id: "p5" });
     await service.feed("u1", 10, after);
-    const where = (prisma.post.findMany as ReturnType<typeof vi.fn>).mock.calls[0][0].where;
-    expect(where.OR).toBeDefined();
-    expect(where.OR[0].createdAt.lt).toBeInstanceOf(Date);
+    const cursorArg = (postRepo.findFeedPage as ReturnType<typeof vi.fn>).mock.calls[0][2];
+    expect(cursorArg).toBeDefined();
+    expect(cursorArg.id).toBe("p5");
   });
 });

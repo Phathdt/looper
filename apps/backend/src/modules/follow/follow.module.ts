@@ -1,9 +1,15 @@
 import { Module } from "@nestjs/common";
-import { FollowResolver } from "./follow.resolver";
-import { FollowService } from "./follow.service";
+import { FollowService } from "./application/services/follow.service";
+import { FollowResolver } from "./infrastructure/resolvers/follow.resolver";
+import { FollowRepository } from "./domain/interfaces/follow.repository";
+import { FollowPrismaRepository } from "./infrastructure/repositories/follow.prisma-repository";
 
 @Module({
-  providers: [FollowResolver, FollowService],
-  exports: [FollowService],
+  providers: [
+    FollowService,
+    FollowResolver,
+    { provide: FollowRepository, useClass: FollowPrismaRepository },
+  ],
+  exports: [FollowService, FollowRepository],
 })
 export class FollowModule {}

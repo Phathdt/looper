@@ -1,7 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import DataLoader from "dataloader";
 import type { Comment, User } from "../../../prisma/generated/client";
-import { PrismaService } from "../prisma/prisma.service";
+import { UserRepository } from "../user/domain/interfaces/user.repository";
+import { CommentRepository } from "../comment/domain/interfaces/comment.repository";
+import { FollowRepository } from "../follow/domain/interfaces/follow.repository";
 
 export interface RequestLoaders {
   userById: DataLoader<string, User | null>;
@@ -12,43 +14,32 @@ export interface RequestLoaders {
 
 @Injectable()
 export class DataLoaderService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly users: UserRepository,
+    private readonly comments: CommentRepository,
+    private readonly follows: FollowRepository,
+  ) {}
 
   createLoaders(viewerId?: string): RequestLoaders {
     return {
       userById: new DataLoader(async (ids) => {
-        const users = await this.prisma.user.findMany({
-          where: { id: { in: [...ids] } },
-        });
-        const map = new Map(users.map((u) => [u.id, u]));
-        return ids.map((id) => map.get(id) ?? null);
+        const allUsers = await Promise.all(ids.map((id) => this.users.findById(id)));
+        return allUsers;
       }),
 
       commentsByPost: new DataLoader(async (postIds) => {
-        const comments = await this.prisma.comment.findMany({
-          where: { postId: { in: [...postIds] } },
-          orderBy: { createdAt: "asc" },
-        });
-        return postIds.map((id) => comments.filter((c) => c.postId === id));
+        const all = await this.comments.findByPostIds(postIds);
+        return postIds.map((id) => all.filter((c) => c.postId === id));
       }),
 
       followersCountByUser: new DataLoader(async (userIds) => {
-        const groups = await this.prisma.follow.groupBy({
-          by: ["followingId"],
-          where: { followingId: { in: [...userIds] } },
-          _count: { followerId: true },
-        });
-        const map = new Map(groups.map((g) => [g.followingId, g._count.followerId]));
+        const map = await this.follows.countFollowers(userIds);
         return userIds.map((id) => map.get(id) ?? 0);
       }),
 
       isFollowingByUser: new DataLoader(async (userIds) => {
         if (!viewerId) return userIds.map(() => false);
-        const follows = await this.prisma.follow.findMany({
-          where: { followerId: viewerId, followingId: { in: [...userIds] } },
-          select: { followingId: true },
-        });
-        const set = new Set(follows.map((f) => f.followingId));
+        const set = await this.follows.isFollowingBatch(viewerId, userIds);
         return userIds.map((id) => set.has(id));
       }),
     };

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeCursor, encodeCursor } from "./feed.cursor";
+import { decodeCursor, encodeCursor } from "./domain/feed-cursor";
 
 describe("feed cursor", () => {
   it("encodes and decodes roundtrip", () => {

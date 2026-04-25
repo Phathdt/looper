@@ -20,12 +20,12 @@ import { DataLoaderService } from "./modules/dataloader/dataloader.service";
   imports: [
     LoggerModule.forRoot(loggerConfig),
     PrismaModule,
-    AuthModule,
-    DataLoaderModule,
     UserModule,
-    PostModule,
     CommentModule,
     FollowModule,
+    PostModule,
+    AuthModule,
+    DataLoaderModule,
     FeedModule,
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,

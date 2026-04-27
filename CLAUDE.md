@@ -23,43 +23,84 @@ packages/tsconfig @looper/tsconfig — shared TS presets
   - FE shared test infra in `apps/frontend/test/{setup,test-utils,vitest.d}.ts` accessed via `@test/*` alias.
 - **Lint**: oxlint v1. 0 warnings / 0 errors target. `import/no-unassigned-import` disabled (legitimate side-effect imports).
 - **Prettier**: 120 col, **single quote, no semi**, trailing commas, `@ianvs/prettier-plugin-sort-imports` (groups: react → @scope → @/ → bare → relative).
-- **Path aliases (BE)**: `@modules/*` → `src/modules/*`, `@common/*` → `src/common/*`. **Single source: `tsconfig.json`**. Vitest reads via `vite-tsconfig-paths` plugin; rolldown via `resolve.tsconfigFilename`; swc-node-register reads tsconfig automatically.
+- **Path aliases (BE)**: `@modules/*` → `src/modules/*`, `@common/*` → `src/common/*`, `@graphql/*` → `src/graphql/*`, `@resolvers/*` → `src/resolvers/*`. **Single source: `tsconfig.json`**. Vitest reads via `vite-tsconfig-paths` plugin; rolldown via `resolve.tsconfigFilename`; swc-node-register reads tsconfig automatically.
 
 ## Backend architecture (3-layer clean architecture)
 
-Each feature module under `apps/backend/src/modules/<feature>/`:
+Top-level layout under `apps/backend/src/`:
 
 ```
-<feature>/
-├── domain/
-│   ├── entities/<feature>.entity.ts          # pure TS interface (POJO, NO decorators)
-│   ├── interfaces/
-│   │   ├── <feature>.repository.ts           # abstract IXxxRepository (DI token)
-│   │   └── <feature>.service.ts              # abstract IXxxService (DI token)
-│   ├── dto/                                  # @InputType + Zod schemas (input only)
-│   └── errors.ts                             # domain errors
-├── application/services/<feature>.service.ts # impl XxxService implements IXxxService
-├── infrastructure/
-│   ├── graphql/<feature>.type.ts             # @ObjectType('Xxx') GraphQL DTO
-│   ├── repositories/<feature>.prisma-repository.ts  # impl XxxPrismaRepository implements IXxxRepository
-│   └── resolvers/<feature>.resolver.ts       # GraphQL transport (uses *Type for schema)
-├── <feature>.module.ts                       # NestJS wiring (provide IXxx, useClass Xxx)
-├── <feature>.service.spec.ts                 # unit (mocked repo)
-├── <feature>.integration.spec.ts             # testcontainers (service-level)
-└── index.ts                                  # barrelsby-generated public API
+src/
+├── app.module.ts                              # registers all resolvers + imports feature modules + GraphQL/DataLoader wiring
+├── resolvers/                                 # GraphQL transport — ALL resolvers live here, NOT inside modules
+│   ├── <feature>.resolver.ts                  # @Resolver — injects IXxxService from module
+│   ├── <feature>.resolver.integration.spec.ts # full GraphQL harness via testcontainers
+│   ├── gql-auth.guard.ts                      # NestJS guard checking req.user
+│   └── current-user.decorator.ts              # @CurrentUser param decorator
+├── graphql/                                   # GraphQL @ObjectType DTOs — presentation layer
+│   ├── <feature>.type.ts                      # @ObjectType('Xxx') class
+│   └── dataloader/                            # batched per-request loaders (transport concern)
+│       ├── dataloader.service.ts
+│       └── dataloader.module.ts
+├── common/graphql/gql-context.ts              # shared GqlContext type
+└── modules/<feature>/                         # business modules — framework-agnostic ports + Prisma adapters
+    ├── domain/
+    │   ├── entities/<feature>.entity.ts       # pure TS POJO, NO decorators
+    │   ├── interfaces/
+    │   │   ├── <feature>.repository.ts        # abstract IXxxRepository (DI token)
+    │   │   └── <feature>.service.ts           # abstract IXxxService (DI token)
+    │   ├── dto/                               # @InputType + Zod schemas (input only)
+    │   └── errors.ts                          # domain errors
+    ├── application/services/<feature>.service.ts  # impl XxxService implements IXxxService — NO @Injectable, NO @nestjs/* imports
+    ├── infrastructure/
+    │   ├── repositories/<feature>.prisma-repository.ts  # impl XxxPrismaRepository implements IXxxRepository
+    │   └── token/<adapter>.ts                 # framework adapters (e.g. jwt-token-signer.ts) — only when service needs framework primitives
+    ├── <feature>.module.ts                    # NestJS wiring — useFactory + inject for services, useClass for repos/adapters
+    ├── <feature>.service.spec.ts              # unit (mocked repo)
+    ├── <feature>.integration.spec.ts          # testcontainers (service-level)
+    └── index.ts                               # barrelsby-generated public API
 ```
+
+**Transport lives at app root, NOT inside modules.** Modules expose services + repos as ports; resolvers/guards/types/dataloaders consume those ports. Lets you swap GraphQL → REST → gRPC without touching feature modules.
 
 ### Naming convention
 
 | Layer      | Abstract (DI token) | Concrete                                   |
 | ---------- | ------------------- | ------------------------------------------ |
-| Service    | `IUserService`      | `UserService`                              |
+| Service    | `IUserService`      | `UserService` (no `@Injectable()`)         |
 | Repository | `IUserRepository`   | `UserPrismaRepository` (technology marker) |
+| FW adapter | `ITokenSigner`      | `JwtTokenSigner` (technology marker)       |
+
+`IXxx` prefix is intentional — abstract class doubles as both the contract type AND the NestJS DI token, so the prefix prevents name collision with the concrete class in the same module. Java/.NET-ish, but pragmatic given the dual role.
+
+### Framework-agnostic domain + application
+
+- **Domain layer (`domain/`)** — zero `@nestjs/*` imports. Entities are POJOs; abstract classes (`IXxxRepository`, `IXxxService`, `ITokenSigner`) are pure TS. Portable to any DI container or no DI at all.
+- **Application services (`application/services/`)** — also zero `@nestjs/*` imports. **No `@Injectable()` decorator.** Constructor takes abstract dependencies; the class is plain TS.
+- **All NestJS wiring lives in `<feature>.module.ts`** — services are registered via `useFactory` + explicit `inject:`:
+
+  ```ts
+  @Module({
+    providers: [
+      { provide: IUserRepository, useClass: UserPrismaRepository },
+      {
+        provide: IUserService,
+        useFactory: (repo: IUserRepository) => new UserService(repo),
+        inject: [IUserRepository],
+      },
+    ],
+    exports: [IUserService, IUserRepository],
+  })
+  ```
+
+- **Framework primitives (`JwtService`, `ConfigService`, etc.) never injected into application services.** Wrap behind a domain interface (e.g. `ITokenSigner`) and adapt in `infrastructure/<feature>/<adapter>.ts`.
+- **`@Injectable()` is allowed on**: resolvers, Prisma repositories, dataloaders, guards, framework adapters (e.g. `JwtTokenSigner`) — anything in `infrastructure/`.
+- **Never use `Symbol`/string DI tokens or `@Inject(TOKEN)` in service constructors** — abstract class as token is the single pattern.
 
 ### Strict rules
 
 - **Domain entities are pure TS** — no `@ObjectType`, no `@Field`, no `@nestjs/graphql` import. Just data shape.
-- **GraphQL DTOs in `infrastructure/graphql/`** — `@ObjectType('Xxx')` preserves schema names; resolver-only fields (computed via DataLoader) are optional `?` here only.
+- **GraphQL DTOs in `src/graphql/`** (top-level, not inside modules) — `@ObjectType('Xxx')` preserves schema names; resolver-only fields (computed via DataLoader) are optional `?` here only.
 - **Application services depend on `IXxxRepository`** — never `PrismaService` directly.
 - **Prisma repos map row → entity** via `toUser/toPost/...` functions; password isolated via separate `UserCredentials` type and `findCredentialsByEmail` method.
 - **Cross-module imports** use `@modules/<name>` (resolves via barrel `index.ts`); same-module uses relative paths.
@@ -177,6 +218,10 @@ pnpm docker:up       # full stack via docker compose
 - Switch dev server to `tsx watch` — esbuild lacks decorator metadata; NestJS DI breaks
 - Re-add `concurrently + nodemon` dev orchestration — single-process swc-node is the pattern
 - Duplicate path aliases across config files — single source in `tsconfig.json`
+- Add `@Injectable()` to any class under `application/services/` — application stays framework-agnostic; wire via `useFactory` in module
+- Inject NestJS framework classes (`JwtService`, `ConfigService`, etc.) directly into application services — wrap behind a domain interface (`ITokenSigner` pattern)
+- Introduce `Symbol`/string DI tokens or `@Inject(TOKEN)` in service constructors — abstract class as token is the single pattern
+- Import `@nestjs/*` from anywhere under `domain/` or `application/` — those layers must stay framework-agnostic
 
 ## Plans + reports
 

@@ -2,11 +2,11 @@ import { Test, type TestingModule } from '@nestjs/testing'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
+import { DataLoaderModule } from '../../graphql/dataloader/dataloader.module'
+import { DataLoaderService } from '../../graphql/dataloader/dataloader.service'
 import { startPostgres, stopPostgres } from '../../test-utils/setup-postgres'
 import { CommentModule } from '../comment/comment.module'
 import { ICommentService } from '../comment/domain/interfaces/comment.service'
-import { DataLoaderModule } from '../dataloader/dataloader.module'
-import { DataLoaderService } from '../dataloader/dataloader.service'
 import { IFollowService } from '../follow/domain/interfaces/follow.service'
 import { FollowModule } from '../follow/follow.module'
 import { IPostService } from '../post/domain/interfaces/post.service'

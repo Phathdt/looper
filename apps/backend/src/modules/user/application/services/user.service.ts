@@ -1,12 +1,10 @@
 import type { Post } from '@modules/post'
-import { Injectable } from '@nestjs/common'
 
 import type { User } from '../../domain/entities/user.entity'
 import { UserNotFoundError } from '../../domain/errors'
 import { IUserRepository } from '../../domain/interfaces/user.repository'
 import { IUserService } from '../../domain/interfaces/user.service'
 
-@Injectable()
 export class UserService implements IUserService {
   constructor(private readonly repo: IUserRepository) {}
 

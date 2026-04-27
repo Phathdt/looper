@@ -1,9 +1,8 @@
 import type { GqlContext } from '@common/graphql/gql-context'
-import { PostType } from '@modules/post'
+import { PostType } from '@graphql/post.type'
+import { UserType } from '@graphql/user.type'
+import { IUserService } from '@modules/user'
 import { Args, Context, ID, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
-
-import { IUserService } from '../../domain/interfaces/user.service'
-import { UserType } from '../graphql/user.type'
 
 @Resolver(() => UserType)
 export class UserResolver {

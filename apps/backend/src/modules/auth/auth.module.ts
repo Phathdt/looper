@@ -1,10 +1,12 @@
+import { IUserRepository } from '@modules/user'
 import { Module } from '@nestjs/common'
-import { JwtModule } from '@nestjs/jwt'
+import { JwtModule, JwtService } from '@nestjs/jwt'
 
 import { UserModule } from '../user/user.module'
 import { AuthService } from './application/services/auth.service'
 import { IAuthService } from './domain/interfaces/auth.service'
-import { AuthResolver } from './infrastructure/resolvers/auth.resolver'
+import { ITokenSigner } from './domain/interfaces/token-signer'
+import { JwtTokenSigner } from './infrastructure/token/jwt-token-signer'
 
 @Module({
   imports: [
@@ -17,7 +19,18 @@ import { AuthResolver } from './infrastructure/resolvers/auth.resolver'
       global: true,
     }),
   ],
-  providers: [AuthResolver, { provide: IAuthService, useClass: AuthService }],
+  providers: [
+    {
+      provide: ITokenSigner,
+      useFactory: (jwt: JwtService) => new JwtTokenSigner(jwt),
+      inject: [JwtService],
+    },
+    {
+      provide: IAuthService,
+      useFactory: (users: IUserRepository, tokens: ITokenSigner) => new AuthService(users, tokens),
+      inject: [IUserRepository, ITokenSigner],
+    },
+  ],
   exports: [IAuthService, JwtModule],
 })
 export class AuthModule {}

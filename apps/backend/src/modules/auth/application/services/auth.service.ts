@@ -1,6 +1,4 @@
 import { IUserRepository } from '@modules/user'
-import { Injectable } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
 
 import { compare, hash } from 'bcryptjs'
 
@@ -8,12 +6,12 @@ import { LoginInput } from '../../domain/dto/login.input'
 import { RegisterInput } from '../../domain/dto/register.input'
 import { EmailAlreadyRegisteredError, InvalidCredentialsError } from '../../domain/errors'
 import { AuthSession, IAuthService } from '../../domain/interfaces/auth.service'
+import { ITokenSigner } from '../../domain/interfaces/token-signer'
 
-@Injectable()
 export class AuthService implements IAuthService {
   constructor(
     private readonly users: IUserRepository,
-    private readonly jwt: JwtService,
+    private readonly tokens: ITokenSigner,
   ) {}
 
   async register(input: RegisterInput): Promise<AuthSession> {
@@ -36,7 +34,7 @@ export class AuthService implements IAuthService {
   }
 
   private sign(user: { id: string; email: string; name: string; createdAt: Date }): AuthSession {
-    const token = this.jwt.sign({ sub: user.id, email: user.email })
+    const token = this.tokens.sign({ sub: user.id, email: user.email })
     return {
       token,
       user: {

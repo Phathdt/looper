@@ -1,9 +1,10 @@
-import { CurrentUser, GqlAuthGuard, type AuthUser } from '@modules/auth'
+import { PostConnectionType } from '@graphql/feed.types'
+import { IFeedService } from '@modules/feed'
 import { UseGuards } from '@nestjs/common'
 import { Args, Int, Query, Resolver } from '@nestjs/graphql'
 
-import { IFeedService } from '../../domain/interfaces/feed.service'
-import { PostConnectionType } from '../graphql/feed.types'
+import { CurrentUser, type AuthUser } from './current-user.decorator'
+import { GqlAuthGuard } from './gql-auth.guard'
 
 @Resolver()
 @UseGuards(GqlAuthGuard)

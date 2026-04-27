@@ -1,11 +1,9 @@
 import { IFollowRepository } from '@modules/follow'
 import { IPostRepository } from '@modules/post'
-import { Injectable } from '@nestjs/common'
 
 import { decodeCursor, encodeCursor } from '../../domain/feed-cursor'
 import { FeedPage, IFeedService } from '../../domain/interfaces/feed.service'
 
-@Injectable()
 export class FeedService implements IFeedService {
   constructor(
     private readonly posts: IPostRepository,

@@ -1,13 +1,13 @@
 import type { GqlContext } from '@common/graphql/gql-context'
-import { CurrentUser, GqlAuthGuard, type AuthUser } from '@modules/auth'
-import { CommentType } from '@modules/comment'
-import { UserType } from '@modules/user'
+import { CommentType } from '@graphql/comment.type'
+import { PostType } from '@graphql/post.type'
+import { UserType } from '@graphql/user.type'
+import { IPostService, type Post } from '@modules/post'
 import { UseGuards } from '@nestjs/common'
 import { Args, Context, Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql'
 
-import type { Post } from '../../domain/entities/post.entity'
-import { IPostService } from '../../domain/interfaces/post.service'
-import { PostType } from '../graphql/post.type'
+import { CurrentUser, type AuthUser } from './current-user.decorator'
+import { GqlAuthGuard } from './gql-auth.guard'
 
 @Resolver(() => PostType)
 export class PostResolver {

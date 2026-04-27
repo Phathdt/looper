@@ -1,5 +1,6 @@
-import { UserType } from '@modules/user'
 import { Field, ID, ObjectType } from '@nestjs/graphql'
+
+import { UserType } from './user.type'
 
 @ObjectType('Comment')
 export class CommentType {

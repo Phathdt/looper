@@ -1,8 +1,9 @@
-import { CurrentUser, GqlAuthGuard, type AuthUser } from '@modules/auth'
+import { IFollowService } from '@modules/follow'
 import { UseGuards } from '@nestjs/common'
 import { Args, ID, Mutation, Resolver } from '@nestjs/graphql'
 
-import { IFollowService } from '../../domain/interfaces/follow.service'
+import { CurrentUser, type AuthUser } from './current-user.decorator'
+import { GqlAuthGuard } from './gql-auth.guard'
 
 @Resolver()
 @UseGuards(GqlAuthGuard)

@@ -5,4 +5,3 @@
 export * from './application/services/feed.service'
 export * from './domain/feed-cursor'
 export * from './domain/interfaces/feed.service'
-export * from './infrastructure/graphql/feed.types'

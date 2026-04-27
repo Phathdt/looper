@@ -1,10 +1,7 @@
-import { Injectable } from '@nestjs/common'
-
 import { CannotFollowSelfError } from '../../domain/errors'
 import { IFollowRepository } from '../../domain/interfaces/follow.repository'
 import { IFollowService } from '../../domain/interfaces/follow.service'
 
-@Injectable()
 export class FollowService implements IFollowService {
   constructor(private readonly repo: IFollowRepository) {}
 

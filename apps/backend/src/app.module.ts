@@ -7,17 +7,23 @@ import { JwtService } from '@nestjs/jwt'
 
 import { LoggerModule } from 'nestjs-pino'
 
-import { AppResolver } from './app.resolver'
+import { DataLoaderModule } from './graphql/dataloader/dataloader.module'
+import { DataLoaderService } from './graphql/dataloader/dataloader.service'
 import { loggerConfig } from './logger.config'
 import { AuthModule } from './modules/auth/auth.module'
 import { CommentModule } from './modules/comment/comment.module'
-import { DataLoaderModule } from './modules/dataloader/dataloader.module'
-import { DataLoaderService } from './modules/dataloader/dataloader.service'
 import { FeedModule } from './modules/feed/feed.module'
 import { FollowModule } from './modules/follow/follow.module'
 import { PostModule } from './modules/post/post.module'
 import { PrismaModule } from './modules/prisma/prisma.module'
 import { UserModule } from './modules/user/user.module'
+import { AppResolver } from './resolvers/app.resolver'
+import { AuthResolver } from './resolvers/auth.resolver'
+import { CommentResolver } from './resolvers/comment.resolver'
+import { FeedResolver } from './resolvers/feed.resolver'
+import { FollowResolver } from './resolvers/follow.resolver'
+import { PostResolver } from './resolvers/post.resolver'
+import { UserResolver } from './resolvers/user.resolver'
 
 @Module({
   imports: [
@@ -53,6 +59,6 @@ import { UserModule } from './modules/user/user.module'
       }),
     }),
   ],
-  providers: [AppResolver],
+  providers: [AppResolver, AuthResolver, CommentResolver, FeedResolver, FollowResolver, PostResolver, UserResolver],
 })
 export class AppModule {}

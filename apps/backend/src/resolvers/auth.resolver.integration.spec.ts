@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import { createGraphQLAppHarness, type GraphQLAppHarness } from '../../../../test-utils/graphql-app-harness'
-import { startPostgres, stopPostgres } from '../../../../test-utils/setup-postgres'
+import { createGraphQLAppHarness, type GraphQLAppHarness } from '../test-utils/graphql-app-harness'
+import { startPostgres, stopPostgres } from '../test-utils/setup-postgres'
 
 describe('AuthResolver (integration)', () => {
   let harness: GraphQLAppHarness

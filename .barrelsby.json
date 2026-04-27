@@ -6,8 +6,8 @@
     "./apps/backend/src/modules/comment",
     "./apps/backend/src/modules/follow",
     "./apps/backend/src/modules/feed",
-    "./apps/backend/src/modules/dataloader",
-    "./apps/backend/src/modules/prisma"
+    "./apps/backend/src/modules/prisma",
+    "./apps/backend/src/graphql/dataloader"
   ],
   "exclude": [
     "\\.spec\\.ts$",

@@ -1,11 +1,10 @@
-import { JwtService } from '@nestjs/jwt'
-
 import { compare, hash } from 'bcryptjs'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { IUserRepository } from '../user/domain/interfaces/user.repository'
 import { AuthService } from './application/services/auth.service'
 import { EmailAlreadyRegisteredError, InvalidCredentialsError } from './domain/errors'
+import type { ITokenSigner } from './domain/interfaces/token-signer'
 
 function makeService() {
   const users = {
@@ -15,8 +14,8 @@ function makeService() {
     create: vi.fn(),
     postsByAuthor: vi.fn(),
   } as unknown as IUserRepository
-  const jwt = { sign: vi.fn(() => 'tok-abc') } as unknown as JwtService
-  return { service: new AuthService(users, jwt), users, jwt }
+  const tokens = { sign: vi.fn(() => 'tok-abc') } as unknown as ITokenSigner
+  return { service: new AuthService(users, tokens), users, tokens }
 }
 
 describe('AuthService (unit)', () => {
@@ -32,7 +31,7 @@ describe('AuthService (unit)', () => {
     })
 
     it('hashes password + creates user + returns signed token', async () => {
-      const { service, users, jwt } = makeService()
+      const { service, users, tokens } = makeService()
       ;(users.findByEmail as ReturnType<typeof vi.fn>).mockResolvedValue(null)
       const created = {
         id: 'u1',
@@ -53,7 +52,7 @@ describe('AuthService (unit)', () => {
       expect(createCall.email).toBe('a@b.c')
       expect(createCall.password).not.toBe('secret123')
       expect(await compare('secret123', createCall.password)).toBe(true)
-      expect(jwt.sign).toHaveBeenCalledWith({ sub: 'u1', email: 'a@b.c' })
+      expect(tokens.sign).toHaveBeenCalledWith({ sub: 'u1', email: 'a@b.c' })
       expect(result.token).toBe('tok-abc')
       expect(result.user.id).toBe('u1')
     })
@@ -82,7 +81,7 @@ describe('AuthService (unit)', () => {
     })
 
     it('returns token on valid credentials', async () => {
-      const { service, users, jwt } = makeService()
+      const { service, users, tokens } = makeService()
       const hashed = await hash('correct', 10)
       ;(users.findCredentialsByEmail as ReturnType<typeof vi.fn>).mockResolvedValue({
         id: 'u1',
@@ -92,7 +91,7 @@ describe('AuthService (unit)', () => {
         createdAt: new Date(),
       })
       const result = await service.login({ email: 'a@b.c', password: 'correct' })
-      expect(jwt.sign).toHaveBeenCalled()
+      expect(tokens.sign).toHaveBeenCalled()
       expect(result.token).toBe('tok-abc')
       expect(result.user.email).toBe('a@b.c')
     })

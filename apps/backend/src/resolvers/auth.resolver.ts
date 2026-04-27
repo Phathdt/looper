@@ -1,11 +1,8 @@
+import { AuthPayloadType } from '@graphql/auth-payload.type'
+import { IAuthService, LoginInput, loginSchema, RegisterInput, registerSchema } from '@modules/auth'
 import { Args, Mutation, Resolver } from '@nestjs/graphql'
 
 import { ZodValidationPipe } from 'nestjs-zod'
-
-import { LoginInput, loginSchema } from '../../domain/dto/login.input'
-import { RegisterInput, registerSchema } from '../../domain/dto/register.input'
-import { IAuthService } from '../../domain/interfaces/auth.service'
-import { AuthPayloadType } from '../graphql/auth-payload.type'
 
 @Resolver(() => AuthPayloadType)
 export class AuthResolver {

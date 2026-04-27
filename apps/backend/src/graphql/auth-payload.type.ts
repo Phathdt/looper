@@ -1,5 +1,6 @@
-import { UserType } from '@modules/user'
 import { Field, ObjectType } from '@nestjs/graphql'
+
+import { UserType } from './user.type'
 
 @ObjectType('AuthPayload')
 export class AuthPayloadType {

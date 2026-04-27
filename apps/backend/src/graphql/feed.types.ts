@@ -1,5 +1,6 @@
-import { PostType } from '@modules/post'
 import { Field, ObjectType } from '@nestjs/graphql'
+
+import { PostType } from './post.type'
 
 @ObjectType('PageInfo')
 export class PageInfoType {

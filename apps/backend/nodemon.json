@@ -1,7 +1,0 @@
-{
-  "watch": ["dist"],
-  "ext": "js",
-  "delay": 300,
-  "ignore": ["dist/*.map"],
-  "script": "dist/main.js"
-}

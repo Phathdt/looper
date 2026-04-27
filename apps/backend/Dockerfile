@@ -41,4 +41,4 @@ WORKDIR /app/apps/backend
 EXPOSE 4000
 
 # Run migrate deploy then start the app
-CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/main.js"]
+CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/main.cjs"]

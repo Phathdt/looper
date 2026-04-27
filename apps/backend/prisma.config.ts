@@ -8,7 +8,7 @@ export default defineConfig({
   schema: path.join('prisma', 'schema.prisma'),
   migrations: {
     path: path.join('prisma', 'migrations'),
-    seed: 'ts-node --transpile-only prisma/seed.ts',
+    seed: 'node --import @swc-node/register/esm-register prisma/seed.ts',
   },
   datasource: {
     url: process.env.DATABASE_URL ?? '',

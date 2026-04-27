@@ -5,7 +5,7 @@ import { defineConfig } from 'rolldown'
 export default defineConfig({
   input: 'src/main.ts',
   output: {
-    file: 'dist/main.js',
+    file: 'dist/main.cjs',
     format: 'cjs',
     inlineDynamicImports: true,
     sourcemap: true,

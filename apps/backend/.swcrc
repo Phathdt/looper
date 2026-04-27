@@ -10,9 +10,14 @@
       "decoratorMetadata": true
     },
     "target": "es2022",
-    "keepClassNames": true
+    "keepClassNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@modules/*": ["src/modules/*"],
+      "@common/*": ["src/common/*"]
+    }
   },
   "module": {
-    "type": "commonjs"
+    "type": "es6"
   }
 }

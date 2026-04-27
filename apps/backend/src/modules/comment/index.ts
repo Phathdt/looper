@@ -5,3 +5,5 @@
 export * from './application/services/comment.service'
 export * from './domain/entities/comment.entity'
 export * from './domain/interfaces/comment.repository'
+export * from './domain/interfaces/comment.service'
+export * from './infrastructure/graphql/comment.type'

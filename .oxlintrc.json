@@ -6,7 +6,8 @@
     "suspicious": "warn"
   },
   "rules": {
-    "typescript/no-extraneous-class": "off"
+    "typescript/no-extraneous-class": "off",
+    "import/no-unassigned-import": "off"
   },
   "ignorePatterns": ["**/dist/**", "**/.turbo/**", "**/node_modules/**", "**/generated/**"]
 }

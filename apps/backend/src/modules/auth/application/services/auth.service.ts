@@ -1,40 +1,41 @@
-import { UserRepository } from '@modules/user'
+import { IUserRepository } from '@modules/user'
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 
-import bcrypt from 'bcryptjs'
+import { compare, hash } from 'bcryptjs'
 
 import { LoginInput } from '../../domain/dto/login.input'
 import { RegisterInput } from '../../domain/dto/register.input'
 import { EmailAlreadyRegisteredError, InvalidCredentialsError } from '../../domain/errors'
+import { AuthSession, IAuthService } from '../../domain/interfaces/auth.service'
 
 @Injectable()
-export class AuthService {
+export class AuthService implements IAuthService {
   constructor(
-    private readonly users: UserRepository,
+    private readonly users: IUserRepository,
     private readonly jwt: JwtService,
   ) {}
 
-  async register(input: RegisterInput) {
+  async register(input: RegisterInput): Promise<AuthSession> {
     const existing = await this.users.findByEmail(input.email)
     if (existing) throw new EmailAlreadyRegisteredError()
 
-    const password = await bcrypt.hash(input.password, 10)
+    const password = await hash(input.password, 10)
     const user = await this.users.create({ name: input.name, email: input.email, password })
     return this.sign(user)
   }
 
-  async login(input: LoginInput) {
-    const user = await this.users.findByEmail(input.email)
-    if (!user) throw new InvalidCredentialsError()
+  async login(input: LoginInput): Promise<AuthSession> {
+    const creds = await this.users.findCredentialsByEmail(input.email)
+    if (!creds) throw new InvalidCredentialsError()
 
-    const ok = await bcrypt.compare(input.password, user.password)
+    const ok = await compare(input.password, creds.password)
     if (!ok) throw new InvalidCredentialsError()
 
-    return this.sign(user)
+    return this.sign(creds)
   }
 
-  private sign(user: { id: string; email: string; name: string; createdAt: Date }) {
+  private sign(user: { id: string; email: string; name: string; createdAt: Date }): AuthSession {
     const token = this.jwt.sign({ sub: user.id, email: user.email })
     return {
       token,

@@ -3,26 +3,26 @@ import { Test, type TestingModule } from '@nestjs/testing'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { startPostgres, stopPostgres } from '../../test-utils/setup-postgres'
-import { CommentService } from '../comment/application/services/comment.service'
 import { CommentModule } from '../comment/comment.module'
+import { ICommentService } from '../comment/domain/interfaces/comment.service'
 import { DataLoaderModule } from '../dataloader/dataloader.module'
 import { DataLoaderService } from '../dataloader/dataloader.service'
-import { FollowService } from '../follow/application/services/follow.service'
+import { IFollowService } from '../follow/domain/interfaces/follow.service'
 import { FollowModule } from '../follow/follow.module'
-import { PostService } from '../post/application/services/post.service'
+import { IPostService } from '../post/domain/interfaces/post.service'
 import { PostModule } from '../post/post.module'
 import { PrismaModule } from '../prisma/prisma.module'
 import { PrismaService } from '../prisma/prisma.service'
-import { UserService } from './application/services/user.service'
+import { IUserService } from './domain/interfaces/user.service'
 import { UserModule } from './user.module'
 
 describe('Domain services (integration)', () => {
   let moduleRef: TestingModule
   let prisma: PrismaService
-  let users: UserService
-  let posts: PostService
-  let comments: CommentService
-  let follows: FollowService
+  let users: IUserService
+  let posts: IPostService
+  let comments: ICommentService
+  let follows: IFollowService
   let loaderSvc: DataLoaderService
 
   let alice: { id: string }
@@ -34,10 +34,10 @@ describe('Domain services (integration)', () => {
       imports: [PrismaModule, UserModule, PostModule, CommentModule, FollowModule, DataLoaderModule],
     }).compile()
     prisma = moduleRef.get(PrismaService)
-    users = moduleRef.get(UserService)
-    posts = moduleRef.get(PostService)
-    comments = moduleRef.get(CommentService)
-    follows = moduleRef.get(FollowService)
+    users = moduleRef.get(IUserService)
+    posts = moduleRef.get(IPostService)
+    comments = moduleRef.get(ICommentService)
+    follows = moduleRef.get(IFollowService)
     loaderSvc = moduleRef.get(DataLoaderService)
 
     alice = await prisma.user.create({

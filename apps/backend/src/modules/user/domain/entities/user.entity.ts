@@ -1,22 +1,10 @@
-import { Field, ID, Int, ObjectType } from '@nestjs/graphql'
+export interface User {
+  id: string
+  name: string
+  email: string
+  createdAt: Date
+}
 
-@ObjectType()
-export class User {
-  @Field(() => ID)
-  id!: string
-
-  @Field()
-  name!: string
-
-  @Field()
-  email!: string
-
-  @Field()
-  createdAt!: Date
-
-  @Field(() => Int)
-  followersCount!: number
-
-  @Field()
-  isFollowing!: boolean
+export interface UserCredentials extends User {
+  password: string
 }

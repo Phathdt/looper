@@ -5,19 +5,19 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { startPostgres, stopPostgres } from '../../test-utils/setup-postgres'
 import { PrismaModule } from '../prisma/prisma.module'
 import { PrismaService } from '../prisma/prisma.service'
-import { FeedService } from './application/services/feed.service'
+import { IFeedService } from './domain/interfaces/feed.service'
 import { FeedModule } from './feed.module'
 
 describe('FeedService (integration)', () => {
   let moduleRef: TestingModule
-  let feed: FeedService
+  let feed: IFeedService
   let prisma: PrismaService
   let viewerId: string
 
   beforeAll(async () => {
     await startPostgres()
     moduleRef = await Test.createTestingModule({ imports: [PrismaModule, FeedModule] }).compile()
-    feed = moduleRef.get(FeedService)
+    feed = moduleRef.get(IFeedService)
     prisma = moduleRef.get(PrismaService)
 
     const viewer = await prisma.user.create({

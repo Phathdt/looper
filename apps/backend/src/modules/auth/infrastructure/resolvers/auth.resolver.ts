@@ -1,21 +1,21 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql'
 
 import { ZodValidationPipe } from '../../../../common/zod-validation.pipe'
-import { AuthService } from '../../application/services/auth.service'
 import { LoginInput, loginSchema } from '../../domain/dto/login.input'
 import { RegisterInput, registerSchema } from '../../domain/dto/register.input'
-import { AuthPayload } from '../../domain/entities/auth-payload.entity'
+import { IAuthService } from '../../domain/interfaces/auth.service'
+import { AuthPayloadType } from '../graphql/auth-payload.type'
 
-@Resolver(() => AuthPayload)
+@Resolver(() => AuthPayloadType)
 export class AuthResolver {
-  constructor(private readonly auth: AuthService) {}
+  constructor(private readonly auth: IAuthService) {}
 
-  @Mutation(() => AuthPayload)
+  @Mutation(() => AuthPayloadType)
   register(@Args('input', new ZodValidationPipe(registerSchema)) input: RegisterInput) {
     return this.auth.register(input)
   }
 
-  @Mutation(() => AuthPayload)
+  @Mutation(() => AuthPayloadType)
   login(@Args('input', new ZodValidationPipe(loginSchema)) input: LoginInput) {
     return this.auth.login(input)
   }

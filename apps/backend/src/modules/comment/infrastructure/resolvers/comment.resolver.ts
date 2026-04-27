@@ -1,18 +1,19 @@
 import type { GqlContext } from '@common/graphql/gql-context'
 import { CurrentUser, GqlAuthGuard, type AuthUser } from '@modules/auth'
-import { User } from '@modules/user'
+import { UserType } from '@modules/user'
 import { UseGuards } from '@nestjs/common'
 import { Args, Context, ID, Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql'
 
-import { CommentService } from '../../application/services/comment.service'
-import { Comment } from '../../domain/entities/comment.entity'
+import type { Comment } from '../../domain/entities/comment.entity'
+import { ICommentService } from '../../domain/interfaces/comment.service'
+import { CommentType } from '../graphql/comment.type'
 
-@Resolver(() => Comment)
+@Resolver(() => CommentType)
 export class CommentResolver {
-  constructor(private readonly comments: CommentService) {}
+  constructor(private readonly comments: ICommentService) {}
 
   @UseGuards(GqlAuthGuard)
-  @Mutation(() => Comment)
+  @Mutation(() => CommentType)
   addComment(
     @CurrentUser() user: AuthUser,
     @Args('postId', { type: () => ID }) postId: string,
@@ -21,9 +22,8 @@ export class CommentResolver {
     return this.comments.create(user.id, postId, content)
   }
 
-  @ResolveField(() => User)
+  @ResolveField(() => UserType)
   async author(@Parent() comment: Comment, @Context() ctx: GqlContext) {
-    const authorId = (comment as unknown as { authorId: string }).authorId
-    return ctx.loaders.userById.load(authorId)
+    return ctx.loaders.userById.load(comment.authorId)
   }
 }

@@ -1,30 +1,30 @@
 import type { GqlContext } from '@common/graphql/gql-context'
 import { CurrentUser, GqlAuthGuard, type AuthUser } from '@modules/auth'
-import { Comment } from '@modules/comment'
-import { User } from '@modules/user'
+import { CommentType } from '@modules/comment'
+import { UserType } from '@modules/user'
 import { UseGuards } from '@nestjs/common'
 import { Args, Context, Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql'
 
-import { PostService } from '../../application/services/post.service'
-import { Post } from '../../domain/entities/post.entity'
+import type { Post } from '../../domain/entities/post.entity'
+import { IPostService } from '../../domain/interfaces/post.service'
+import { PostType } from '../graphql/post.type'
 
-@Resolver(() => Post)
+@Resolver(() => PostType)
 export class PostResolver {
-  constructor(private readonly posts: PostService) {}
+  constructor(private readonly posts: IPostService) {}
 
   @UseGuards(GqlAuthGuard)
-  @Mutation(() => Post)
+  @Mutation(() => PostType)
   createPost(@CurrentUser() user: AuthUser, @Args('content') content: string) {
     return this.posts.create(user.id, content)
   }
 
-  @ResolveField(() => User)
-  async author(@Parent() post: Post & { authorId?: string }, @Context() ctx: GqlContext) {
-    const authorId = (post as unknown as { authorId: string }).authorId
-    return ctx.loaders.userById.load(authorId)
+  @ResolveField(() => UserType)
+  async author(@Parent() post: Post, @Context() ctx: GqlContext) {
+    return ctx.loaders.userById.load(post.authorId)
   }
 
-  @ResolveField(() => [Comment])
+  @ResolveField(() => [CommentType])
   comments(@Parent() post: Post, @Context() ctx: GqlContext) {
     return ctx.loaders.commentsByPost.load(post.id)
   }

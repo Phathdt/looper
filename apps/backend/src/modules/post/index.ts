@@ -5,3 +5,5 @@
 export * from './application/services/post.service'
 export * from './domain/entities/post.entity'
 export * from './domain/interfaces/post.repository'
+export * from './domain/interfaces/post.service'
+export * from './infrastructure/graphql/post.type'

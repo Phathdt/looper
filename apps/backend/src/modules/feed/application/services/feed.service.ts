@@ -1,17 +1,18 @@
-import { FollowRepository } from '@modules/follow'
-import { PostRepository } from '@modules/post'
+import { IFollowRepository } from '@modules/follow'
+import { IPostRepository } from '@modules/post'
 import { Injectable } from '@nestjs/common'
 
 import { decodeCursor, encodeCursor } from '../../domain/feed-cursor'
+import { FeedPage, IFeedService } from '../../domain/interfaces/feed.service'
 
 @Injectable()
-export class FeedService {
+export class FeedService implements IFeedService {
   constructor(
-    private readonly posts: PostRepository,
-    private readonly follows: FollowRepository,
+    private readonly posts: IPostRepository,
+    private readonly follows: IFollowRepository,
   ) {}
 
-  async feed(viewerId: string, first = 10, after?: string) {
+  async feed(viewerId: string, first = 10, after?: string): Promise<FeedPage> {
     const take = Math.min(Math.max(first, 1), 50)
 
     const followingIds = await this.follows.listFollowingIds(viewerId)

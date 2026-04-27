@@ -1,19 +1,20 @@
 import { JwtService } from '@nestjs/jwt'
 
-import bcrypt from 'bcryptjs'
+import { compare, hash } from 'bcryptjs'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { UserRepository } from '../user/domain/interfaces/user.repository'
+import type { IUserRepository } from '../user/domain/interfaces/user.repository'
 import { AuthService } from './application/services/auth.service'
 import { EmailAlreadyRegisteredError, InvalidCredentialsError } from './domain/errors'
 
 function makeService() {
   const users = {
     findByEmail: vi.fn(),
+    findCredentialsByEmail: vi.fn(),
     findById: vi.fn(),
     create: vi.fn(),
     postsByAuthor: vi.fn(),
-  } as unknown as UserRepository
+  } as unknown as IUserRepository
   const jwt = { sign: vi.fn(() => 'tok-abc') } as unknown as JwtService
   return { service: new AuthService(users, jwt), users, jwt }
 }
@@ -51,7 +52,7 @@ describe('AuthService (unit)', () => {
       const createCall = (users.create as ReturnType<typeof vi.fn>).mock.calls[0][0]
       expect(createCall.email).toBe('a@b.c')
       expect(createCall.password).not.toBe('secret123')
-      expect(await bcrypt.compare('secret123', createCall.password)).toBe(true)
+      expect(await compare('secret123', createCall.password)).toBe(true)
       expect(jwt.sign).toHaveBeenCalledWith({ sub: 'u1', email: 'a@b.c' })
       expect(result.token).toBe('tok-abc')
       expect(result.user.id).toBe('u1')
@@ -61,7 +62,7 @@ describe('AuthService (unit)', () => {
   describe('login', () => {
     it('rejects missing user', async () => {
       const { service, users } = makeService()
-      ;(users.findByEmail as ReturnType<typeof vi.fn>).mockResolvedValue(null)
+      ;(users.findCredentialsByEmail as ReturnType<typeof vi.fn>).mockResolvedValue(null)
       await expect(service.login({ email: 'nope@x.x', password: 'any' })).rejects.toBeInstanceOf(
         InvalidCredentialsError,
       )
@@ -69,12 +70,12 @@ describe('AuthService (unit)', () => {
 
     it('rejects wrong password', async () => {
       const { service, users } = makeService()
-      const hash = await bcrypt.hash('correct', 10)
-      ;(users.findByEmail as ReturnType<typeof vi.fn>).mockResolvedValue({
+      const hashed = await hash('correct', 10)
+      ;(users.findCredentialsByEmail as ReturnType<typeof vi.fn>).mockResolvedValue({
         id: 'u1',
         name: 'a',
         email: 'a@b.c',
-        password: hash,
+        password: hashed,
         createdAt: new Date(),
       })
       await expect(service.login({ email: 'a@b.c', password: 'wrong' })).rejects.toBeInstanceOf(InvalidCredentialsError)
@@ -82,12 +83,12 @@ describe('AuthService (unit)', () => {
 
     it('returns token on valid credentials', async () => {
       const { service, users, jwt } = makeService()
-      const hash = await bcrypt.hash('correct', 10)
-      ;(users.findByEmail as ReturnType<typeof vi.fn>).mockResolvedValue({
+      const hashed = await hash('correct', 10)
+      ;(users.findCredentialsByEmail as ReturnType<typeof vi.fn>).mockResolvedValue({
         id: 'u1',
         name: 'a',
         email: 'a@b.c',
-        password: hash,
+        password: hashed,
         createdAt: new Date(),
       })
       const result = await service.login({ email: 'a@b.c', password: 'correct' })

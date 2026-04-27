@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { FollowRepository } from '../follow/domain/interfaces/follow.repository'
-import type { PostRepository } from '../post/domain/interfaces/post.repository'
+import type { IFollowRepository } from '../follow/domain/interfaces/follow.repository'
+import type { IPostRepository } from '../post/domain/interfaces/post.repository'
 import { FeedService } from './application/services/feed.service'
 import { decodeCursor, encodeCursor } from './domain/feed-cursor'
 
@@ -18,7 +18,7 @@ function makeService(posts: ReturnType<typeof makePost>[]) {
     findById: vi.fn(),
     create: vi.fn(),
     findByAuthor: vi.fn(),
-  } as unknown as PostRepository
+  } as unknown as IPostRepository
 
   const followRepo = {
     listFollowingIds: vi.fn(async () => []),
@@ -26,7 +26,7 @@ function makeService(posts: ReturnType<typeof makePost>[]) {
     unfollow: vi.fn(),
     countFollowers: vi.fn(),
     isFollowingBatch: vi.fn(),
-  } as unknown as FollowRepository
+  } as unknown as IFollowRepository
 
   return { service: new FeedService(postRepo, followRepo), postRepo, followRepo }
 }

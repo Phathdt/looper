@@ -3,30 +3,43 @@ import { PrismaService } from '@modules/prisma'
 import { Injectable } from '@nestjs/common'
 
 import type { Post as PrismaPost } from '../../../../../prisma/generated/client'
-import { PostRepository } from '../../domain/interfaces/post.repository'
+import type { Post } from '../../domain/entities/post.entity'
+import { IPostRepository } from '../../domain/interfaces/post.repository'
+
+function toPost(row: PrismaPost): Post {
+  return {
+    id: row.id,
+    content: row.content,
+    createdAt: row.createdAt,
+    authorId: row.authorId,
+  }
+}
 
 @Injectable()
-export class PostPrismaRepository implements PostRepository {
+export class PostPrismaRepository implements IPostRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  findById(id: string): Promise<PrismaPost | null> {
-    return this.prisma.post.findUnique({ where: { id } })
+  async findById(id: string): Promise<Post | null> {
+    const row = await this.prisma.post.findUnique({ where: { id } })
+    return row ? toPost(row) : null
   }
 
-  create(authorId: string, content: string): Promise<PrismaPost> {
-    return this.prisma.post.create({ data: { authorId, content } })
+  async create(authorId: string, content: string): Promise<Post> {
+    const row = await this.prisma.post.create({ data: { authorId, content } })
+    return toPost(row)
   }
 
-  findByAuthor(authorId: string, first: number): Promise<PrismaPost[]> {
-    return this.prisma.post.findMany({
+  async findByAuthor(authorId: string, first: number): Promise<Post[]> {
+    const rows = await this.prisma.post.findMany({
       where: { authorId },
       orderBy: { createdAt: 'desc' },
       take: first,
     })
+    return rows.map(toPost)
   }
 
-  findFeedPage(authorIds: string[], take: number, after?: FeedCursor): Promise<PrismaPost[]> {
-    return this.prisma.post.findMany({
+  async findFeedPage(authorIds: string[], take: number, after?: FeedCursor): Promise<Post[]> {
+    const rows = await this.prisma.post.findMany({
       where: {
         authorId: { in: authorIds },
         ...(after && {
@@ -39,5 +52,6 @@ export class PostPrismaRepository implements PostRepository {
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take,
     })
+    return rows.map(toPost)
   }
 }

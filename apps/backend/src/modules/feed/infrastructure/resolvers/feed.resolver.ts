@@ -2,15 +2,15 @@ import { CurrentUser, GqlAuthGuard, type AuthUser } from '@modules/auth'
 import { UseGuards } from '@nestjs/common'
 import { Args, Int, Query, Resolver } from '@nestjs/graphql'
 
-import { FeedService } from '../../application/services/feed.service'
-import { PostConnection } from '../../domain/entities/feed.entities'
+import { IFeedService } from '../../domain/interfaces/feed.service'
+import { PostConnectionType } from '../graphql/feed.types'
 
 @Resolver()
 @UseGuards(GqlAuthGuard)
 export class FeedResolver {
-  constructor(private readonly feedService: FeedService) {}
+  constructor(private readonly feedService: IFeedService) {}
 
-  @Query(() => PostConnection, { name: 'feed' })
+  @Query(() => PostConnectionType, { name: 'feed' })
   getFeed(
     @CurrentUser() user: AuthUser,
     @Args('first', { type: () => Int, nullable: true, defaultValue: 10 }) first: number,

@@ -5,3 +5,4 @@
 export * from './application/services/follow.service'
 export * from './domain/errors'
 export * from './domain/interfaces/follow.repository'
+export * from './domain/interfaces/follow.service'

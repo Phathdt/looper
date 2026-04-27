@@ -1,11 +1,9 @@
-import { CommentRepository } from '@modules/comment'
-import { FollowRepository } from '@modules/follow'
-import { UserRepository } from '@modules/user'
+import { Comment, ICommentRepository } from '@modules/comment'
+import { IFollowRepository } from '@modules/follow'
+import { IUserRepository, User } from '@modules/user'
 import { Injectable } from '@nestjs/common'
 
 import DataLoader from 'dataloader'
-
-import type { Comment, User } from '../../../prisma/generated/client'
 
 export interface RequestLoaders {
   userById: DataLoader<string, User | null>
@@ -17,9 +15,9 @@ export interface RequestLoaders {
 @Injectable()
 export class DataLoaderService {
   constructor(
-    private readonly users: UserRepository,
-    private readonly comments: CommentRepository,
-    private readonly follows: FollowRepository,
+    private readonly users: IUserRepository,
+    private readonly comments: ICommentRepository,
+    private readonly follows: IFollowRepository,
   ) {}
 
   createLoaders(viewerId?: string): RequestLoaders {

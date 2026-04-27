@@ -1,4 +1,4 @@
-export abstract class FollowRepository {
+export abstract class IFollowRepository {
   abstract follow(followerId: string, followingId: string): Promise<void>
   abstract unfollow(followerId: string, followingId: string): Promise<void>
   abstract listFollowingIds(followerId: string): Promise<string[]>

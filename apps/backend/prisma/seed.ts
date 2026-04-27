@@ -2,7 +2,7 @@ import 'dotenv/config'
 
 import { PrismaPg } from '@prisma/adapter-pg'
 
-import bcrypt from 'bcryptjs'
+import { hash } from 'bcryptjs'
 
 import { PrismaClient } from './generated/client'
 
@@ -16,7 +16,7 @@ async function main() {
   await prisma.follow.deleteMany()
   await prisma.user.deleteMany()
 
-  const password = await bcrypt.hash('password123', 10)
+  const password = await hash('password123', 10)
 
   const users = await Promise.all(
     ['alice', 'bob', 'carol', 'dave', 'eve'].map((name, i) =>

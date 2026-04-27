@@ -1,10 +1,10 @@
 import type { FeedCursor } from '@modules/feed'
 
-import type { Post as PrismaPost } from '../../../../../prisma/generated/client'
+import type { Post } from '../entities/post.entity'
 
-export abstract class PostRepository {
-  abstract findById(id: string): Promise<PrismaPost | null>
-  abstract create(authorId: string, content: string): Promise<PrismaPost>
-  abstract findByAuthor(authorId: string, first: number): Promise<PrismaPost[]>
-  abstract findFeedPage(authorIds: string[], take: number, after?: FeedCursor): Promise<PrismaPost[]>
+export abstract class IPostRepository {
+  abstract findById(id: string): Promise<Post | null>
+  abstract create(authorId: string, content: string): Promise<Post>
+  abstract findByAuthor(authorId: string, first: number): Promise<Post[]>
+  abstract findFeedPage(authorIds: string[], take: number, after?: FeedCursor): Promise<Post[]>
 }

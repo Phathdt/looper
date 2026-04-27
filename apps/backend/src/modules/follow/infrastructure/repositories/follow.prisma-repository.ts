@@ -1,10 +1,10 @@
 import { PrismaService } from '@modules/prisma'
 import { Injectable } from '@nestjs/common'
 
-import { FollowRepository } from '../../domain/interfaces/follow.repository'
+import { IFollowRepository } from '../../domain/interfaces/follow.repository'
 
 @Injectable()
-export class FollowPrismaRepository implements FollowRepository {
+export class FollowPrismaRepository implements IFollowRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async follow(followerId: string, followingId: string): Promise<void> {

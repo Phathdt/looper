@@ -4,12 +4,12 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { startPostgres, stopPostgres } from '../../test-utils/setup-postgres'
 import { PrismaModule } from '../prisma/prisma.module'
-import { AuthService } from './application/services/auth.service'
 import { AuthModule } from './auth.module'
+import { IAuthService } from './domain/interfaces/auth.service'
 
 describe('AuthService (integration)', () => {
   let moduleRef: TestingModule
-  let auth: AuthService
+  let auth: IAuthService
 
   beforeAll(async () => {
     await startPostgres()
@@ -17,7 +17,7 @@ describe('AuthService (integration)', () => {
     moduleRef = await Test.createTestingModule({
       imports: [PrismaModule, AuthModule],
     }).compile()
-    auth = moduleRef.get(AuthService)
+    auth = moduleRef.get(IAuthService)
   })
 
   afterAll(async () => {

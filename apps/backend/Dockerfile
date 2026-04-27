@@ -27,6 +27,7 @@ ENV NODE_ENV=production
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc ./
 COPY packages/tsconfig ./packages/tsconfig
 COPY apps/backend/package.json ./apps/backend/
+COPY apps/backend/tsconfig.json ./apps/backend/tsconfig.json
 COPY apps/backend/prisma ./apps/backend/prisma
 COPY apps/backend/prisma.config.ts ./apps/backend/prisma.config.ts
 

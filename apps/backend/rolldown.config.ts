@@ -1,5 +1,3 @@
-import path from 'node:path'
-
 import { defineConfig } from 'rolldown'
 
 export default defineConfig({
@@ -12,10 +10,7 @@ export default defineConfig({
   },
   platform: 'node',
   resolve: {
-    alias: {
-      '@modules': path.resolve(__dirname, 'src/modules'),
-      '@common': path.resolve(__dirname, 'src/common'),
-    },
+    tsconfigFilename: 'tsconfig.json',
   },
   external: (id) =>
     !id.startsWith('.') && !id.startsWith('/') && !id.startsWith('@modules') && !id.startsWith('@common'),

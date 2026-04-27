@@ -1,16 +1,9 @@
-import path from 'node:path'
-
 import swc from 'unplugin-swc'
+import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [swc.vite({ module: { type: 'es6' } })],
-  resolve: {
-    alias: {
-      '@modules': path.resolve(__dirname, 'src/modules'),
-      '@common': path.resolve(__dirname, 'src/common'),
-    },
-  },
+  plugins: [tsconfigPaths(), swc.vite({ module: { type: 'es6' } })],
   test: {
     globals: true,
     environment: 'node',

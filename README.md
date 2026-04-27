@@ -6,14 +6,15 @@ and a fully tested React 19 + NestJS 11 stack inside a Turborepo monorepo.
 
 ## Stack
 
-| Layer        | Tech                                                                                   |
-| ------------ | -------------------------------------------------------------------------------------- |
-| Monorepo     | Turborepo, pnpm workspaces                                                             |
-| Frontend     | React 19, Vite 8, Tailwind 4, TanStack Query 5, React Hook Form + Zod, GraphQL Codegen |
-| Backend      | NestJS 11, Apollo 5, GraphQL 16, Prisma 7 + PostgreSQL, DataLoader, Zod DTOs, Pino     |
-| Bundler (BE) | rolldown (CJS, externalize deps)                                                       |
-| Testing      | Vitest 4, Testcontainers, Cucumber + Playwright (E2E)                                  |
-| Tooling      | oxlint v1, prettier (sort-imports), lefthook, lint-staged, knip, barrelsby, TS 5.9     |
+| Layer            | Tech                                                                                   |
+| ---------------- | -------------------------------------------------------------------------------------- |
+| Monorepo         | Turborepo, pnpm workspaces                                                             |
+| Frontend         | React 19, Vite 8, Tailwind 4, TanStack Query 5, React Hook Form + Zod, GraphQL Codegen |
+| Backend          | NestJS 11, Apollo 5, GraphQL 16, Prisma 7 + PostgreSQL, DataLoader, nestjs-zod, Pino   |
+| Dev runtime (BE) | swc-node/register --watch (single-process, ESM, decorator metadata)                    |
+| Bundler (BE)     | rolldown (CJS, externalize deps) → `dist/main.cjs`                                     |
+| Testing          | Vitest 4, Testcontainers, Cucumber + Playwright (E2E)                                  |
+| Tooling          | oxlint v1, prettier (sort-imports), lefthook, lint-staged, knip, barrelsby, TS 5.9     |
 
 ## Project layout
 
@@ -84,26 +85,35 @@ Seeded credentials: `alice@looper.dev` / `password123`.
 
 ## Backend (`apps/backend`)
 
-**Clean architecture** per module:
+**3-layer clean architecture** per module:
 
 ```
 modules/<feature>/
-├── application/services/             # use-cases, no Prisma
-├── domain/{entities,dto,interfaces,errors}/
-├── infrastructure/{repositories,resolvers}/
-├── <feature>.module.ts
-├── <feature>.{service.spec, integration.spec}.ts
-└── index.ts                          # barrelsby-generated
+├── domain/
+│   ├── entities/<feature>.entity.ts       # pure TS interface, NO decorators
+│   ├── interfaces/                        # abstract IXxxService + IXxxRepository (DI tokens)
+│   ├── dto/                               # @InputType + Zod schemas
+│   └── errors.ts
+├── application/services/                  # XxxService implements IXxxService
+├── infrastructure/
+│   ├── graphql/<feature>.type.ts          # @ObjectType('Xxx') GraphQL DTO
+│   ├── repositories/                      # XxxPrismaRepository implements IXxxRepository
+│   └── resolvers/
+├── <feature>.module.ts                    # provide IXxx, useClass Xxx
+├── *.spec.ts / *.integration.spec.ts
+└── index.ts                               # barrelsby-generated
 ```
 
-- **Modules**: `auth, user, post, comment, follow, feed, dataloader, prisma, graphql`
-- **Path aliases**: `@modules/<name>` resolves to module barrel `index.ts`
-- **Repositories** are abstract classes (DI tokens). Application services depend on these — never on `PrismaService`. Prisma impls live in `infrastructure/repositories/`.
-- **DTOs** use Zod schemas + custom `ZodValidationPipe` (no `class-validator`)
+- **Modules**: `auth, user, post, comment, follow, feed, dataloader, prisma`
+- **Naming**: abstract `IXxxService`/`IXxxRepository` (interface marker) vs concrete `XxxService`/`XxxPrismaRepository`
+- **Path aliases**: single source in `tsconfig.json` (`@modules/<name>`, `@common/*`); vitest reads via `vite-tsconfig-paths`, rolldown via `resolve.tsconfigFilename`, swc-node-register inherits from tsconfig
+- **Domain entities are POJO interfaces** — no `@nestjs/graphql` import; GraphQL types live in `infrastructure/graphql/*.type.ts` decorated with `@ObjectType('Xxx')` to preserve schema names
+- **Application services depend on `IXxxRepository`** — never `PrismaService`. Prisma impls map row → entity via `toUser/toPost/...` functions; password isolated via `UserCredentials` type + `findCredentialsByEmail`
+- **Validation**: `nestjs-zod`'s `ZodValidationPipe` per-arg (input only); output trusts BE producers
 - **Prisma 7** driver-adapter pattern: `PrismaPg` from `@prisma/adapter-pg` + `prisma.config.ts` for migrations (no `url` in schema)
 - **Seed** deterministic for e2e reproducibility
-- **DataLoader** injects repositories — per-request loaders for `userById`, `commentsByPost`, `followersCountByUser`, `isFollowingByUser`, eliminating N+1 on nested feed queries
-- **Dev**: `concurrently('rolldown -c -w', 'nodemon')` — bundle rebuilds, nodemon restarts node on output change (300ms debounce)
+- **DataLoader** injects `IXxxRepository` — per-request loaders for `userById`, `commentsByPost`, `followersCountByUser`, `isFollowingByUser`, eliminating N+1 on nested feed queries
+- **Dev**: `node --import @swc-node/register/esm-register --watch src/main.ts` — single process, SWC handles decorator metadata (esbuild/tsx don't)
 
 ## Frontend (`apps/frontend`)
 
@@ -130,19 +140,19 @@ modules/<feature>/
 | Suite                                                    | Count                   | Time |
 | -------------------------------------------------------- | ----------------------- | ---- |
 | BE unit (`*.spec.ts`)                                    | 13                      | <1s  |
-| BE integration (`*.integration.spec.ts`, testcontainers) | 24                      | ~10s |
+| BE integration (`*.integration.spec.ts`, testcontainers) | 63 / 8 files            | ~9s  |
 | FE (colocated unit + hooks)                              | 91 / 24 files           | ~3s  |
 | E2E (Cucumber + Playwright)                              | 13 scenarios / 46 steps | ~8s  |
-| **Total automated**                                      | **141**                 |      |
+| **Total automated**                                      | **180**                 |      |
 
 ### Coverage
 
 |          | Statements | Branches | Functions | Lines |
 | -------- | ---------- | -------- | --------- | ----- |
-| Backend  | 100%       | 95.8%    | 100%      | 100%  |
+| Backend  | 96.6%      | 91.2%    | 95.7%     | 97.8% |
 | Frontend | 98.3%      | 86.5%    | 95.1%     | 99.4% |
 
-Thresholds: BE 80/75/80/80 · FE 90/80/85/90.
+Thresholds: BE 80/75/80/80 · FE 90/80/85/90. Prisma repos 100% (4 dedicated repo specs).
 
 ## N+1 demo
 
@@ -181,7 +191,7 @@ pnpm docker:build                  # build BE + FE images
 pnpm docker:up                     # postgres + backend + nginx-frontend
 ```
 
-- Backend: bundled via rolldown, runs `prisma migrate deploy && node dist/main.js`
+- Backend: bundled via rolldown, runs `prisma migrate deploy && node dist/main.cjs`
 - Frontend: `vite build` + nginx (gzip, `/assets/` cache 1y, `/graphql` proxy → backend, SPA fallback)
 - Postgres: healthcheck-gated; backend waits for it
 

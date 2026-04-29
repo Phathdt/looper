@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt'
 
 import { LoggerModule } from 'nestjs-pino'
 
+import { requestContext, type RequestStats } from './common/request-context'
 import { DataLoaderModule } from './graphql/dataloader/dataloader.module'
 import { DataLoaderService } from './graphql/dataloader/dataloader.service'
 import { loggerConfig } from './logger.config'
@@ -24,6 +25,24 @@ import { FeedResolver } from './resolvers/feed.resolver'
 import { FollowResolver } from './resolvers/follow.resolver'
 import { PostResolver } from './resolvers/post.resolver'
 import { UserResolver } from './resolvers/user.resolver'
+
+const demoStatsPlugin = {
+  async requestDidStart() {
+    return {
+      async willSendResponse({ response, contextValue }: any) {
+        const stats: RequestStats | undefined = contextValue?.stats
+        if (!stats) return
+        if (response.body.kind === 'single') {
+          response.body.singleResult.extensions = {
+            ...(response.body.singleResult.extensions ?? {}),
+            queryCount: stats.queryCount,
+            dataLoaderEnabled: stats.dataLoaderEnabled,
+          }
+        }
+      },
+    }
+  },
+}
 
 @Module({
   imports: [
@@ -44,6 +63,7 @@ import { UserResolver } from './resolvers/user.resolver'
         autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
         sortSchema: true,
         playground: true,
+        plugins: [demoStatsPlugin],
         context: ({ req }: { req: any }) => {
           const auth = req.headers.authorization as string | undefined
           if (auth?.startsWith('Bearer ')) {
@@ -54,7 +74,14 @@ import { UserResolver } from './resolvers/user.resolver'
               /* invalid token — leave unauthenticated */
             }
           }
-          return { req, loaders: loaderSvc.createLoaders(req.user?.id) }
+          const dataLoaderEnabled = req.headers['x-disable-dataloader'] !== '1'
+          const stats: RequestStats = { queryCount: 0, dataLoaderEnabled }
+          requestContext.enterWith(stats)
+          return {
+            req,
+            loaders: loaderSvc.createLoaders(req.user?.id, { batch: dataLoaderEnabled }),
+            stats,
+          }
         },
       }),
     }),

@@ -14,8 +14,13 @@ export class UserResolver {
   }
 
   @ResolveField(() => [PostType])
-  posts(@Parent() user: UserType, @Args('first', { type: () => Int, nullable: true, defaultValue: 20 }) first: number) {
-    return this.users.postsByAuthor(user.id, first)
+  async posts(
+    @Parent() user: UserType,
+    @Args('first', { type: () => Int, nullable: true, defaultValue: 20 }) first: number,
+    @Context() ctx: GqlContext,
+  ) {
+    const all = await ctx.loaders.postsByAuthor.load(user.id)
+    return first >= all.length ? all : all.slice(0, first)
   }
 
   @ResolveField(() => Int)

@@ -108,6 +108,36 @@ describe('UserPrismaRepository (integration)', () => {
     })
   })
 
+  describe('postsByAuthors', () => {
+    it('returns map of authorId → posts (capped at first), missing authors omitted', async () => {
+      const stamp = Date.now()
+      const a = await prisma.user.create({
+        data: { name: 'multi-a', email: `multi-a-${stamp}@t.dev`, password: 'x' },
+      })
+      const b = await prisma.user.create({
+        data: { name: 'multi-b', email: `multi-b-${stamp}@t.dev`, password: 'x' },
+      })
+      const now = Date.now()
+      await prisma.post.createMany({
+        data: [
+          { authorId: a.id, content: 'a1', createdAt: new Date(now - 4000) },
+          { authorId: a.id, content: 'a2', createdAt: new Date(now - 3000) },
+          { authorId: a.id, content: 'a3', createdAt: new Date(now - 2000) },
+          { authorId: b.id, content: 'b1', createdAt: new Date(now - 1000) },
+        ],
+      })
+
+      const map = await repo.postsByAuthors([a.id, b.id], 2)
+      expect(map.get(a.id)?.map((p) => p.content)).toEqual(['a3', 'a2'])
+      expect(map.get(b.id)?.map((p) => p.content)).toEqual(['b1'])
+    })
+
+    it('returns empty map for empty input', async () => {
+      const map = await repo.postsByAuthors([], 10)
+      expect(map.size).toBe(0)
+    })
+  })
+
   describe('postsByAuthor', () => {
     it('returns mapped posts ordered by createdAt desc, limited to first', async () => {
       const author = await prisma.user.create({

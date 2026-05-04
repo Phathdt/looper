@@ -72,4 +72,19 @@ export class UserPrismaRepository implements IUserRepository {
     })
     return rows.map(toPost)
   }
+
+  async postsByAuthors(authorIds: readonly string[], first: number): Promise<Map<string, Post[]>> {
+    if (authorIds.length === 0) return new Map()
+    const rows = await this.prisma.post.findMany({
+      where: { authorId: { in: [...authorIds] } },
+      orderBy: { createdAt: 'desc' },
+    })
+    const byAuthor = new Map<string, Post[]>()
+    for (const row of rows) {
+      const list = byAuthor.get(row.authorId) ?? []
+      if (list.length < first) list.push(toPost(row))
+      byAuthor.set(row.authorId, list)
+    }
+    return byAuthor
+  }
 }

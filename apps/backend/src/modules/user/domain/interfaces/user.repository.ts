@@ -9,4 +9,5 @@ export abstract class IUserRepository {
   abstract findCredentialsByEmail(email: string): Promise<UserCredentials | null>
   abstract create(data: { name: string; email: string; password: string }): Promise<User>
   abstract postsByAuthor(authorId: string, first: number): Promise<Post[]>
+  abstract postsByAuthors(authorIds: readonly string[], first: number): Promise<Map<string, Post[]>>
 }

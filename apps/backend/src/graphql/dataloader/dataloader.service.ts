@@ -1,6 +1,7 @@
 import { Comment, ICommentRepository } from '@modules/comment'
 import { IFollowRepository } from '@modules/follow'
 import { ILikeRepository } from '@modules/like'
+import { Post } from '@modules/post'
 import { IUserRepository, User } from '@modules/user'
 import { Injectable } from '@nestjs/common'
 
@@ -17,7 +18,10 @@ export interface RequestLoaders {
   isFollowingByUser: KeyedLoader<string, boolean>
   likesCountByPost: KeyedLoader<string, number>
   isLikedByPost: KeyedLoader<string, boolean>
+  postsByAuthor: KeyedLoader<string, Post[]>
 }
+
+const POSTS_BY_AUTHOR_DEFAULT_FIRST = 20
 
 export interface CreateLoadersOptions {
   batch?: boolean
@@ -70,6 +74,9 @@ export class DataLoaderService {
             return set.has(postId)
           },
         },
+        postsByAuthor: {
+          load: (authorId) => this.users.postsByAuthor(authorId, POSTS_BY_AUTHOR_DEFAULT_FIRST),
+        },
       }
     }
 
@@ -105,6 +112,11 @@ export class DataLoaderService {
         if (!viewerId) return postIds.map(() => false)
         const set = await this.likes.likedByViewer(viewerId, postIds)
         return postIds.map((id) => set.has(id))
+      }),
+
+      postsByAuthor: new DataLoader(async (authorIds) => {
+        const map = await this.users.postsByAuthors(authorIds, POSTS_BY_AUTHOR_DEFAULT_FIRST)
+        return authorIds.map((id) => map.get(id) ?? [])
       }),
     }
   }

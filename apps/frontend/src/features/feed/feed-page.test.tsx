@@ -25,6 +25,8 @@ let feedState: HookResult = {
 vi.mock('@/generated/graphql', () => ({
   useInfiniteFeedQuery: () => feedState,
   useAddCommentMutation: () => ({ mutate: vi.fn(), isPending: false }),
+  useLikePostMutation: () => ({ mutate: vi.fn(), isPending: false }),
+  useUnlikePostMutation: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
 function renderPage() {
@@ -36,6 +38,7 @@ const samplePost = {
   content: 'hello world',
   createdAt: new Date().toISOString(),
   likesCount: 1,
+  isLiked: false,
   author: { id: 'u1', name: 'alice' },
   comments: [],
 }

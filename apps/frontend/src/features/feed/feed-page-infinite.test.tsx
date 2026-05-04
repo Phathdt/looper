@@ -33,6 +33,7 @@ let state: HookResult = {
                 content: 'x',
                 createdAt: new Date().toISOString(),
                 likesCount: 0,
+                isLiked: false,
                 author: { id: 'u', name: 'a' },
                 comments: [],
               },
@@ -47,6 +48,8 @@ let state: HookResult = {
 vi.mock('@/generated/graphql', () => ({
   useInfiniteFeedQuery: () => state,
   useAddCommentMutation: () => ({ mutate: vi.fn(), isPending: false }),
+  useLikePostMutation: () => ({ mutate: vi.fn(), isPending: false }),
+  useUnlikePostMutation: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
 describe('<FeedPage /> more states', () => {

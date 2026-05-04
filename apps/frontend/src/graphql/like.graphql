@@ -1,0 +1,7 @@
+mutation LikePost($postId: ID!) {
+  likePost(postId: $postId)
+}
+
+mutation UnlikePost($postId: ID!) {
+  unlikePost(postId: $postId)
+}

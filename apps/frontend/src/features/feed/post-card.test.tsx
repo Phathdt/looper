@@ -7,9 +7,25 @@ import { PostCard } from '@/features/feed/post-card'
 import { describe, expect, it, vi } from 'vitest'
 
 const addCommentMutate = vi.fn()
+const likeMutate = vi.fn()
+const unlikeMutate = vi.fn()
 
 vi.mock('@/generated/graphql', () => ({
   useAddCommentMutation: () => ({ mutate: addCommentMutate, isPending: false }),
+  useLikePostMutation: (opts?: { onMutate?: () => void }) => ({
+    mutate: (vars: unknown) => {
+      opts?.onMutate?.()
+      likeMutate(vars)
+    },
+    isPending: false,
+  }),
+  useUnlikePostMutation: (opts?: { onMutate?: () => void }) => ({
+    mutate: (vars: unknown) => {
+      opts?.onMutate?.()
+      unlikeMutate(vars)
+    },
+    isPending: false,
+  }),
 }))
 
 const basePost = {
@@ -17,6 +33,7 @@ const basePost = {
   content: 'hello world',
   createdAt: new Date().toISOString(),
   likesCount: 3,
+  isLiked: false,
   author: { id: 'u1', name: 'alice' },
   comments: [
     { id: 'c1', content: 'first', author: { id: 'u2', name: 'bob' } },
@@ -57,5 +74,36 @@ describe('<PostCard />', () => {
     renderCard({ ...basePost, comments: [] })
     await userEvent.click(screen.getByRole('button', { name: /no comments/i }))
     expect(screen.getByText(/no comments yet/i)).toBeInTheDocument()
+  })
+
+  it('renders like button with initial count and unliked state', () => {
+    renderCard()
+    const button = screen.getByTestId('like-button')
+    expect(button).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getByTestId('like-count')).toHaveTextContent('3')
+  })
+
+  it('renders liked state when post.isLiked is true', () => {
+    renderCard({ ...basePost, isLiked: true })
+    const button = screen.getByTestId('like-button')
+    expect(button).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('clicking like increments count and triggers likePost mutation', async () => {
+    likeMutate.mockClear()
+    renderCard()
+    await userEvent.click(screen.getByTestId('like-button'))
+    expect(likeMutate).toHaveBeenCalledWith({ postId: 'p1' })
+    expect(screen.getByTestId('like-count')).toHaveTextContent('4')
+    expect(screen.getByTestId('like-button')).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('clicking unlike on already-liked post decrements and triggers unlikePost', async () => {
+    unlikeMutate.mockClear()
+    renderCard({ ...basePost, isLiked: true })
+    await userEvent.click(screen.getByTestId('like-button'))
+    expect(unlikeMutate).toHaveBeenCalledWith({ postId: 'p1' })
+    expect(screen.getByTestId('like-count')).toHaveTextContent('2')
+    expect(screen.getByTestId('like-button')).toHaveAttribute('aria-pressed', 'false')
   })
 })

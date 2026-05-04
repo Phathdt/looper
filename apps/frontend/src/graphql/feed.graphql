@@ -11,6 +11,7 @@ query Feed($first: Int, $after: String) {
         content
         createdAt
         likesCount
+        isLiked
         author {
           id
           name

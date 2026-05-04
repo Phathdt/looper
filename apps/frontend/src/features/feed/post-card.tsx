@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useAddComment } from '@/features/post/hooks/use-add-comment'
+import { useLikePost } from '@/features/post/hooks/use-like-post'
 import type { FeedQuery } from '@/generated/graphql'
 import { formatRelativeTime } from '@/lib/format'
 
@@ -24,6 +25,16 @@ export function PostCard({ post }: PostCardProps) {
     formState: { isValid },
   } = form
   const commentCount = post.comments.length
+  const {
+    liked,
+    count,
+    toggle,
+    isPending: likePending,
+  } = useLikePost({
+    postId: post.id,
+    initialLiked: post.isLiked,
+    initialCount: post.likesCount,
+  })
 
   return (
     <Card data-testid='post-card'>
@@ -43,7 +54,21 @@ export function PostCard({ post }: PostCardProps) {
         <p className='text-sm leading-relaxed whitespace-pre-wrap'>{post.content}</p>
 
         <div className='flex items-center gap-4 text-xs text-muted-foreground'>
-          <span>{post.likesCount} likes</span>
+          <button
+            type='button'
+            onClick={toggle}
+            disabled={likePending}
+            data-testid='like-button'
+            aria-pressed={liked}
+            aria-label={liked ? 'Unlike post' : 'Like post'}
+            className={`flex items-center gap-1 transition-colors disabled:opacity-50 ${
+              liked ? 'text-red-500' : 'hover:text-foreground'
+            }`}
+          >
+            <span aria-hidden='true'>{liked ? '♥' : '♡'}</span>
+            <span data-testid='like-count'>{count}</span>
+            <span className='sr-only'>likes</span>
+          </button>
           <button
             type='button'
             onClick={() => setShowComments((v) => !v)}

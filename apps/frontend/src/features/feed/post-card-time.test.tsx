@@ -7,6 +7,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/generated/graphql', () => ({
   useAddCommentMutation: () => ({ mutate: vi.fn(), isPending: false }),
+  useLikePostMutation: () => ({ mutate: vi.fn(), isPending: false }),
+  useUnlikePostMutation: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
 const makePost = (createdAt: string) => ({
@@ -14,6 +16,7 @@ const makePost = (createdAt: string) => ({
   content: 'hi',
   createdAt,
   likesCount: 0,
+  isLiked: false,
   author: { id: 'u', name: 'alice' },
   comments: [],
 })

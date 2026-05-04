@@ -15,6 +15,7 @@ import { AuthModule } from './modules/auth/auth.module'
 import { CommentModule } from './modules/comment/comment.module'
 import { FeedModule } from './modules/feed/feed.module'
 import { FollowModule } from './modules/follow/follow.module'
+import { LikeModule } from './modules/like/like.module'
 import { PostModule } from './modules/post/post.module'
 import { PrismaModule } from './modules/prisma/prisma.module'
 import { UserModule } from './modules/user/user.module'
@@ -23,6 +24,7 @@ import { AuthResolver } from './resolvers/auth.resolver'
 import { CommentResolver } from './resolvers/comment.resolver'
 import { FeedResolver } from './resolvers/feed.resolver'
 import { FollowResolver } from './resolvers/follow.resolver'
+import { LikeResolver } from './resolvers/like.resolver'
 import { PostResolver } from './resolvers/post.resolver'
 import { UserResolver } from './resolvers/user.resolver'
 
@@ -51,6 +53,7 @@ const demoStatsPlugin = {
     UserModule,
     CommentModule,
     FollowModule,
+    LikeModule,
     PostModule,
     AuthModule,
     DataLoaderModule,
@@ -86,6 +89,15 @@ const demoStatsPlugin = {
       }),
     }),
   ],
-  providers: [AppResolver, AuthResolver, CommentResolver, FeedResolver, FollowResolver, PostResolver, UserResolver],
+  providers: [
+    AppResolver,
+    AuthResolver,
+    CommentResolver,
+    FeedResolver,
+    FollowResolver,
+    LikeResolver,
+    PostResolver,
+    UserResolver,
+  ],
 })
 export class AppModule {}

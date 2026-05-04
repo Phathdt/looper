@@ -43,6 +43,31 @@ describe('UserPrismaRepository (integration)', () => {
     })
   })
 
+  describe('findByIds', () => {
+    it('returns users matching the given ids without password', async () => {
+      const stamp = Date.now()
+      const a = await prisma.user.create({ data: { name: 'a', email: `bulk-a-${stamp}@t.dev`, password: 'h' } })
+      const b = await prisma.user.create({ data: { name: 'b', email: `bulk-b-${stamp}@t.dev`, password: 'h' } })
+      const users = await repo.findByIds([a.id, b.id])
+      const ids = users.map((u) => u.id).sort()
+      expect(ids).toEqual([a.id, b.id].sort())
+      expect((users[0] as unknown as Record<string, unknown>).password).toBeUndefined()
+    })
+
+    it('skips ids that do not exist', async () => {
+      const a = await prisma.user.create({
+        data: { name: 'partial', email: `partial-${Date.now()}@t.dev`, password: 'h' },
+      })
+      const users = await repo.findByIds([a.id, '00000000-0000-0000-0000-000000000000'])
+      expect(users).toHaveLength(1)
+      expect(users[0].id).toBe(a.id)
+    })
+
+    it('returns empty array for empty input without hitting db', async () => {
+      expect(await repo.findByIds([])).toEqual([])
+    })
+  })
+
   describe('findByEmail', () => {
     it('returns user without password', async () => {
       const email = `email-${Date.now()}@t.dev`

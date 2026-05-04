@@ -43,6 +43,12 @@ export class UserPrismaRepository implements IUserRepository {
     return row ? toUser(row) : null
   }
 
+  async findByIds(ids: string[]): Promise<User[]> {
+    if (ids.length === 0) return []
+    const rows = await this.prisma.user.findMany({ where: { id: { in: ids } } })
+    return rows.map(toUser)
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const row = await this.prisma.user.findUnique({ where: { email } })
     return row ? toUser(row) : null

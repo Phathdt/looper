@@ -22,4 +22,7 @@ export class PostType {
 
   @Field(() => Int)
   likesCount?: number
+
+  @Field(() => Boolean)
+  isLiked?: boolean
 }

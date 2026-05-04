@@ -11,6 +11,7 @@ const prisma = new PrismaClient({
 })
 
 async function main() {
+  await prisma.like.deleteMany()
   await prisma.comment.deleteMany()
   await prisma.post.deleteMany()
   await prisma.follow.deleteMany()
@@ -80,7 +81,19 @@ async function main() {
     })
   }
 
-  console.log(`Seeded: ${users.length} users, ${posts.length} posts`)
+  // Deterministic likes: each user likes posts NOT authored by themselves.
+  // Pattern: user[i] likes posts[j] where (i + j) % 3 !== 0 → ~13 likes per user, ~67 total.
+  let likeCount = 0
+  for (let i = 0; i < users.length; i++) {
+    for (let j = 0; j < posts.length; j++) {
+      if (posts[j].authorId === users[i].id) continue
+      if ((i + j) % 3 === 0) continue
+      await prisma.like.create({ data: { userId: users[i].id, postId: posts[j].id } })
+      likeCount++
+    }
+  }
+
+  console.log(`Seeded: ${users.length} users, ${posts.length} posts, ${likeCount} likes`)
 }
 
 main()

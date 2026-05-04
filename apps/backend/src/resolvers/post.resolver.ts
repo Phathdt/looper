@@ -30,7 +30,12 @@ export class PostResolver {
   }
 
   @ResolveField(() => Number)
-  likesCount() {
-    return 0
+  likesCount(@Parent() post: Post, @Context() ctx: GqlContext) {
+    return ctx.loaders.likesCountByPost.load(post.id)
+  }
+
+  @ResolveField(() => Boolean)
+  isLiked(@Parent() post: Post, @Context() ctx: GqlContext) {
+    return ctx.loaders.isLikedByPost.load(post.id)
   }
 }

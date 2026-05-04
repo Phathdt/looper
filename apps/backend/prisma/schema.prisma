@@ -18,6 +18,7 @@ model User {
   comments  Comment[]
   followers Follow[]  @relation("following")
   following Follow[]  @relation("follower")
+  likes     Like[]
   createdAt DateTime  @default(now())
 }
 
@@ -27,6 +28,7 @@ model Post {
   authorId  String
   author    User      @relation(fields: [authorId], references: [id])
   comments  Comment[]
+  likes     Like[]
   createdAt DateTime  @default(now())
 
   @@index([authorId, createdAt])
@@ -51,4 +53,15 @@ model Follow {
   following   User   @relation("following", fields: [followingId], references: [id])
 
   @@id([followerId, followingId])
+}
+
+model Like {
+  userId    String
+  postId    String
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@id([userId, postId])
+  @@index([postId])
 }

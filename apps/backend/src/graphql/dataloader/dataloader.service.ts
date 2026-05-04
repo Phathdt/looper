@@ -1,5 +1,6 @@
 import { Comment, ICommentRepository } from '@modules/comment'
 import { IFollowRepository } from '@modules/follow'
+import { ILikeRepository } from '@modules/like'
 import { IUserRepository, User } from '@modules/user'
 import { Injectable } from '@nestjs/common'
 
@@ -14,6 +15,8 @@ export interface RequestLoaders {
   commentsByPost: KeyedLoader<string, Comment[]>
   followersCountByUser: KeyedLoader<string, number>
   isFollowingByUser: KeyedLoader<string, boolean>
+  likesCountByPost: KeyedLoader<string, number>
+  isLikedByPost: KeyedLoader<string, boolean>
 }
 
 export interface CreateLoadersOptions {
@@ -26,6 +29,7 @@ export class DataLoaderService {
     private readonly users: IUserRepository,
     private readonly comments: ICommentRepository,
     private readonly follows: IFollowRepository,
+    private readonly likes: ILikeRepository,
   ) {}
 
   createLoaders(viewerId?: string, opts: CreateLoadersOptions = {}): RequestLoaders {
@@ -53,13 +57,27 @@ export class DataLoaderService {
             return set.has(userId)
           },
         },
+        likesCountByPost: {
+          load: async (postId) => {
+            const map = await this.likes.countByPostIds([postId])
+            return map.get(postId) ?? 0
+          },
+        },
+        isLikedByPost: {
+          load: async (postId) => {
+            if (!viewerId) return false
+            const set = await this.likes.likedByViewer(viewerId, [postId])
+            return set.has(postId)
+          },
+        },
       }
     }
 
     return {
       userById: new DataLoader(async (ids) => {
-        const allUsers = await Promise.all(ids.map((id) => this.users.findById(id)))
-        return allUsers
+        const all = await this.users.findByIds([...ids])
+        const byId = new Map(all.map((u) => [u.id, u]))
+        return ids.map((id) => byId.get(id) ?? null)
       }),
 
       commentsByPost: new DataLoader(async (postIds) => {
@@ -76,6 +94,17 @@ export class DataLoaderService {
         if (!viewerId) return userIds.map(() => false)
         const set = await this.follows.isFollowingBatch(viewerId, userIds)
         return userIds.map((id) => set.has(id))
+      }),
+
+      likesCountByPost: new DataLoader(async (postIds) => {
+        const map = await this.likes.countByPostIds(postIds)
+        return postIds.map((id) => map.get(id) ?? 0)
+      }),
+
+      isLikedByPost: new DataLoader(async (postIds) => {
+        if (!viewerId) return postIds.map(() => false)
+        const set = await this.likes.likedByViewer(viewerId, postIds)
+        return postIds.map((id) => set.has(id))
       }),
     }
   }

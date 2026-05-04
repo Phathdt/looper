@@ -28,9 +28,11 @@ type Mutation {
   addComment(content: String!, postId: ID!): Comment!
   createPost(content: String!): Post!
   follow(userId: ID!): Boolean!
+  likePost(postId: ID!): Boolean!
   login(input: LoginInput!): AuthPayload!
   register(input: RegisterInput!): AuthPayload!
   unfollow(userId: ID!): Boolean!
+  unlikePost(postId: ID!): Boolean!
 }
 
 type PageInfo {
@@ -44,6 +46,7 @@ type Post {
   content: String!
   createdAt: DateTime!
   id: ID!
+  isLiked: Boolean!
   likesCount: Int!
 }
 

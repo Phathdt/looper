@@ -13,7 +13,7 @@ export class TypedDocumentString<TResult, TVariables> extends String {
 `
 
 const config: CodegenConfig = {
-  schema: 'http://localhost:4000/graphql',
+  schema: '../backend/src/schema.gql',
   documents: ['src/**/*.graphql'],
   generates: {
     'src/generated/graphql.ts': {

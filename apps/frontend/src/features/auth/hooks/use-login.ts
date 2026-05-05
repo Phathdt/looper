@@ -23,6 +23,7 @@ export function useLogin() {
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
+    mode: 'onChange',
   })
 
   const { mutate, isPending } = useLoginMutation({

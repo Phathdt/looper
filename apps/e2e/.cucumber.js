@@ -12,11 +12,19 @@ function getCliFeaturePaths() {
 
 const cliFeaturePaths = getCliFeaturePaths()
 
+// Parallel workers — 2 by default, override via env CUCUMBER_PARALLEL.
+// Cucumber distributes scenarios across workers (each worker = own browser).
+// Most tests are hermetic (faker emails per registration); a few scenarios
+// still touch the shared seeded alice@looper.dev — those use idempotent ops
+// (login, like upsert) so concurrent runs don't conflict.
+const parallel = Number(process.env.CUCUMBER_PARALLEL ?? 2)
+
 module.exports = {
   default: {
     requireModule: ['ts-node/register', 'tsconfig-paths/register'],
     require: ['tests/features/**/*.steps.ts', 'tests/support/**/*.ts'],
     paths: cliFeaturePaths.length > 0 ? cliFeaturePaths : ['tests/features/**/*.feature'],
+    parallel,
     format: [
       process.env.TEST_ENVIRONMENT === 'ci' ? 'progress' : 'progress-bar',
       'json:test-results/cucumber-report.json',

@@ -10,7 +10,7 @@ export function RegisterPage() {
   const { form, submit, isPending, serverError } = useRegister()
   const {
     register,
-    formState: { errors },
+    formState: { errors, isValid },
   } = form
 
   return (
@@ -57,7 +57,7 @@ export function RegisterPage() {
                 {serverError}
               </p>
             )}
-            <Button type='submit' disabled={isPending}>
+            <Button type='submit' disabled={isPending || !isValid}>
               {isPending ? 'Creating account…' : 'Create account'}
             </Button>
           </form>

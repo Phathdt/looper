@@ -22,3 +22,8 @@ Then('I should see my new post at the top of the feed', async function (this: Br
     timeout: TimeoutValue.ACTION,
   })
 })
+
+Then('the create post submit button should be disabled', async function (this: BrowserWorld) {
+  const button = this.page.getByRole('button', { name: /^post$|publish|share/i })
+  await expect(button).toBeDisabled({ timeout: TimeoutValue.ACTION })
+})

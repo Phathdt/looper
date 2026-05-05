@@ -23,6 +23,7 @@ export function useCreatePost() {
   const form = useForm<CreatePostValues>({
     resolver: zodResolver(createPostSchema),
     defaultValues: { content: '' },
+    mode: 'onChange',
   })
 
   const { mutate, isPending } = useCreatePostMutation({

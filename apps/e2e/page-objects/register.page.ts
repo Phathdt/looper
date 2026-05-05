@@ -40,4 +40,14 @@ export class RegisterPage {
     const error = this.page.getByText(/already|exist|failed|invalid/i).first()
     await expect(error).toBeVisible({ timeout: TimeoutValue.ACTION })
   }
+
+  async fillForm(name: string, email: string, password: string): Promise<void> {
+    await this.nameInput.fill(name)
+    await this.emailInput.fill(email)
+    await this.passwordInput.fill(password)
+  }
+
+  async expectSubmitDisabled(): Promise<void> {
+    await expect(this.submitButton).toBeDisabled({ timeout: TimeoutValue.ACTION })
+  }
 }

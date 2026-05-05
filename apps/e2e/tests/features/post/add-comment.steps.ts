@@ -21,3 +21,10 @@ Then('the comment {string} should be visible', async function (this: BrowserWorl
     timeout: TimeoutValue.ACTION,
   })
 })
+
+Then('the comment send button should be disabled', async function (this: BrowserWorld) {
+  const firstCard = this.page.locator("[data-testid='post-card']").first()
+  await expect(firstCard.getByRole('button', { name: /send/i })).toBeDisabled({
+    timeout: TimeoutValue.ACTION,
+  })
+})

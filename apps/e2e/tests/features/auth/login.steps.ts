@@ -32,3 +32,7 @@ Then('I should remain on the login page', async function (this: BrowserWorld) {
 Then('I should see a login error', async function (this: BrowserWorld) {
   await new LoginPage(this.page).expectErrorVisible()
 })
+
+Then('the login submit button should be disabled', async function (this: BrowserWorld) {
+  await new LoginPage(this.page).expectSubmitDisabled()
+})

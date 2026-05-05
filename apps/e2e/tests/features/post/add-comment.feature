@@ -11,3 +11,10 @@ Feature: Add Comment to Post
     And I expand the first post's comments
     And I submit a comment "Nice post e2e"
     Then the comment "Nice post e2e" should be visible
+
+  @priority_medium
+  Scenario: Send button is disabled when comment is empty
+    Given I am logged in as the seeded user
+    When I visit the feed page
+    And I expand the first post's comments
+    Then the comment send button should be disabled

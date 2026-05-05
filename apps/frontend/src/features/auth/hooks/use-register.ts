@@ -24,6 +24,7 @@ export function useRegister() {
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: { name: '', email: '', password: '' },
+    mode: 'onChange',
   })
 
   const { mutate, isPending } = useRegisterMutation({

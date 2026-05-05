@@ -16,3 +16,8 @@ Feature: User Authentication - Login
     When I submit invalid login credentials
     Then I should remain on the login page
     And I should see a login error
+
+  @priority_medium
+  Scenario: Login submit button disabled when form is empty
+    Given I navigate to the login page
+    Then the login submit button should be disabled

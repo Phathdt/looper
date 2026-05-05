@@ -6,8 +6,8 @@ Feature: Like / Unlike Post
 
   @priority_high
   Scenario: Like and unlike a post from the feed
-    Given I am logged in as the seeded user
-    When I visit the feed page
+    Given I have a fresh viewer with a likable post in their feed
+    When I navigate to the home feed
     Then the first post's like button should be visible
     When I remember the first post's like count
     And I click the first post's like button
@@ -19,8 +19,8 @@ Feature: Like / Unlike Post
 
   @priority_medium
   Scenario: Like state persists after page reload
-    Given I am logged in as the seeded user
-    When I visit the feed page
+    Given I have a fresh viewer with a likable post in their feed
+    When I navigate to the home feed
     And I click the first post's like button
     Then the first post should be in the liked state
     When I reload the page

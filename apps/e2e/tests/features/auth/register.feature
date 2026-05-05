@@ -16,3 +16,9 @@ Feature: User Authentication - Register
     When I register with an existing email
     Then I should remain on the register page
     And I should see a register error
+
+  @priority_medium
+  Scenario: Register rejects short password (client-side Zod)
+    Given I navigate to the register page
+    When I fill the register form with a short password
+    Then the register submit button should be disabled

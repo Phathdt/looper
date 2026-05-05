@@ -10,7 +10,7 @@ export function LoginPage() {
   const { form, submit, isPending, serverError } = useLogin()
   const {
     register,
-    formState: { errors },
+    formState: { errors, isValid },
   } = form
 
   return (
@@ -47,7 +47,7 @@ export function LoginPage() {
                 {serverError}
               </p>
             )}
-            <Button type='submit' disabled={isPending}>
+            <Button type='submit' disabled={isPending || !isValid}>
               {isPending ? 'Signing in…' : 'Sign in'}
             </Button>
           </form>

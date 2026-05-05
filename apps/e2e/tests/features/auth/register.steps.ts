@@ -37,3 +37,12 @@ Then('I should see a register error', async function (this: BrowserWorld) {
 Then('I should land on the feed page', async function (this: BrowserWorld) {
   await new FeedPage(this.page).expectLoaded()
 })
+
+When('I fill the register form with a short password', async function (this: BrowserWorld) {
+  const stamp = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+  await new RegisterPage(this.page).fillForm('Tom', `short-${stamp}@looper.test`, '123')
+})
+
+Then('the register submit button should be disabled', async function (this: BrowserWorld) {
+  await new RegisterPage(this.page).expectSubmitDisabled()
+})

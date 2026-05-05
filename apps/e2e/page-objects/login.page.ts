@@ -42,4 +42,8 @@ export class LoginPage {
     const error = this.page.getByText(/invalid|incorrect|failed/i).first()
     await expect(error).toBeVisible({ timeout: TimeoutValue.ACTION })
   }
+
+  async expectSubmitDisabled(): Promise<void> {
+    await expect(this.submitButton).toBeDisabled({ timeout: TimeoutValue.ACTION })
+  }
 }

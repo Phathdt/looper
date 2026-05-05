@@ -11,3 +11,9 @@ Feature: Create Post
     When I submit a new post with content "Hello from e2e test"
     Then I should be redirected to the feed page
     And I should see my new post at the top of the feed
+
+  @priority_medium
+  Scenario: Create post submit button is disabled when content is empty
+    Given I am logged in as the seeded user
+    And I navigate to the create post page
+    Then the create post submit button should be disabled

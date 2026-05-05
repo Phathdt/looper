@@ -18,6 +18,7 @@ export function useAddComment(postId: string) {
   const form = useForm<AddCommentValues>({
     resolver: zodResolver(addCommentSchema),
     defaultValues: { text: '' },
+    mode: 'onChange',
   })
 
   const { mutate, isPending } = useAddCommentMutation({

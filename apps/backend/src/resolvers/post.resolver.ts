@@ -3,8 +3,12 @@ import { CommentType } from '@graphql/comment.type'
 import { PostType } from '@graphql/post.type'
 import { UserType } from '@graphql/user.type'
 import { IPostService, type Post } from '@modules/post'
+import { postContentSchema } from '@modules/post/domain/dto/post-content.schema'
 import { UseGuards } from '@nestjs/common'
 import { Args, Context, Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql'
+import { Throttle } from '@nestjs/throttler'
+
+import { ZodValidationPipe } from 'nestjs-zod'
 
 import { CurrentUser, type AuthUser } from './current-user.decorator'
 import { GqlAuthGuard } from './gql-auth.guard'
@@ -14,8 +18,12 @@ export class PostResolver {
   constructor(private readonly posts: IPostService) {}
 
   @UseGuards(GqlAuthGuard)
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
   @Mutation(() => PostType)
-  createPost(@CurrentUser() user: AuthUser, @Args('content') content: string) {
+  createPost(
+    @CurrentUser() user: AuthUser,
+    @Args('content', new ZodValidationPipe(postContentSchema)) content: string,
+  ) {
     return this.posts.create(user.id, content)
   }
 

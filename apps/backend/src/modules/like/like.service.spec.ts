@@ -1,6 +1,9 @@
+import type { IPostRepository } from '@modules/post'
+
 import { describe, expect, it, vi } from 'vitest'
 
 import { LikeService } from './application/services/like.service'
+import { CannotLikeOwnPostError, PostNotFoundError } from './domain/errors'
 import type { ILikeRepository } from './domain/interfaces/like.repository'
 
 function makeRepo() {
@@ -12,18 +15,45 @@ function makeRepo() {
   } as unknown as ILikeRepository
 }
 
+function makePosts(found: { id: string; authorId: string } | null) {
+  return {
+    findById: vi.fn(async () => found),
+    create: vi.fn(),
+    findByAuthor: vi.fn(),
+    findFeedPage: vi.fn(),
+  } as unknown as IPostRepository
+}
+
 describe('LikeService', () => {
-  it('like: delegates to repo and returns true', async () => {
+  it('like: succeeds when post exists and viewer is not the author', async () => {
     const repo = makeRepo()
-    const svc = new LikeService(repo)
+    const posts = makePosts({ id: 'p1', authorId: 'someone-else' })
+    const svc = new LikeService(repo, posts)
     const ok = await svc.like('u1', 'p1')
     expect(ok).toBe(true)
     expect(repo.like).toHaveBeenCalledWith('u1', 'p1')
   })
 
-  it('unlike: delegates to repo and returns true', async () => {
+  it('like: throws PostNotFoundError when post does not exist', async () => {
     const repo = makeRepo()
-    const svc = new LikeService(repo)
+    const posts = makePosts(null)
+    const svc = new LikeService(repo, posts)
+    await expect(svc.like('u1', 'missing')).rejects.toBeInstanceOf(PostNotFoundError)
+    expect(repo.like).not.toHaveBeenCalled()
+  })
+
+  it('like: throws CannotLikeOwnPostError when liking own post', async () => {
+    const repo = makeRepo()
+    const posts = makePosts({ id: 'p1', authorId: 'u1' })
+    const svc = new LikeService(repo, posts)
+    await expect(svc.like('u1', 'p1')).rejects.toBeInstanceOf(CannotLikeOwnPostError)
+    expect(repo.like).not.toHaveBeenCalled()
+  })
+
+  it('unlike: delegates to repo and returns true (no validation)', async () => {
+    const repo = makeRepo()
+    const posts = makePosts(null)
+    const svc = new LikeService(repo, posts)
     const ok = await svc.unlike('u1', 'p1')
     expect(ok).toBe(true)
     expect(repo.unlike).toHaveBeenCalledWith('u1', 'p1')

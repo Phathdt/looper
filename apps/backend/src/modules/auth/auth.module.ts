@@ -12,10 +12,16 @@ import { JwtTokenSigner } from './infrastructure/token/jwt-token-signer'
   imports: [
     UserModule,
     JwtModule.registerAsync({
-      useFactory: () => ({
-        secret: process.env.JWT_SECRET ?? 'change-me',
-        signOptions: { expiresIn: '7d' },
-      }),
+      useFactory: () => {
+        const secret = process.env.JWT_SECRET
+        if (!secret && process.env.NODE_ENV === 'production') {
+          throw new Error('JWT_SECRET environment variable is required in production')
+        }
+        return {
+          secret: secret ?? 'change-me',
+          signOptions: { expiresIn: '7d' },
+        }
+      },
       global: true,
     }),
   ],

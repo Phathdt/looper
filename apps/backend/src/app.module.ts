@@ -2,12 +2,15 @@ import { join } from 'node:path'
 
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { Module } from '@nestjs/common'
+import { APP_GUARD } from '@nestjs/core'
 import { GraphQLModule } from '@nestjs/graphql'
 import { JwtService } from '@nestjs/jwt'
+import { ThrottlerModule } from '@nestjs/throttler'
 
 import { LoggerModule } from 'nestjs-pino'
 
 import { requestContext, type RequestStats } from './common/request-context'
+import { GqlThrottlerGuard } from './common/throttler/gql-throttler.guard'
 import { DataLoaderModule } from './graphql/dataloader/dataloader.module'
 import { DataLoaderService } from './graphql/dataloader/dataloader.service'
 import { loggerConfig } from './logger.config'
@@ -49,6 +52,7 @@ const demoStatsPlugin = {
 @Module({
   imports: [
     LoggerModule.forRoot(loggerConfig),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     PrismaModule,
     UserModule,
     CommentModule,
@@ -90,6 +94,7 @@ const demoStatsPlugin = {
     }),
   ],
   providers: [
+    { provide: APP_GUARD, useClass: GqlThrottlerGuard },
     AppResolver,
     AuthResolver,
     CommentResolver,

@@ -34,7 +34,9 @@ async function main() {
 
   const posts: Array<{ id: string; authorId: string; content: string; createdAt: Date }> = []
   for (let i = 0; i < 20; i++) {
-    const author = users[i % users.length]
+    // Offset by 1 so the most recent post (i=0) is by Bob, not Alice — keeps
+    // alice's e2e flows able to like the first post in her feed.
+    const author = users[(i + 1) % users.length]
     posts.push(
       await prisma.post.create({
         data: {
@@ -81,10 +83,12 @@ async function main() {
     })
   }
 
-  // Deterministic likes: each user likes posts NOT authored by themselves.
-  // Pattern: user[i] likes posts[j] where (i + j) % 3 !== 0 → ~13 likes per user, ~67 total.
+  // Deterministic likes: each user (EXCEPT alice — index 0) likes posts NOT
+  // authored by themselves. Alice is the e2e seeded user; leaving her likes
+  // empty lets e2e flows reliably "click like" without pre-existing state.
+  // Pattern: user[i] likes posts[j] where (i + j) % 3 !== 0 → ~10 likes/user.
   let likeCount = 0
-  for (let i = 0; i < users.length; i++) {
+  for (let i = 1; i < users.length; i++) {
     for (let j = 0; j < posts.length; j++) {
       if (posts[j].authorId === users[i].id) continue
       if ((i + j) % 3 === 0) continue

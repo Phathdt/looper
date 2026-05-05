@@ -7,7 +7,8 @@
   },
   "rules": {
     "typescript/no-extraneous-class": "off",
-    "import/no-unassigned-import": "off"
+    "import/no-unassigned-import": "off",
+    "no-underscore-dangle": ["warn", { "allow": ["_count", "__typename", "__meta__", "__apiType"] }]
   },
   "ignorePatterns": ["**/dist/**", "**/.turbo/**", "**/node_modules/**", "**/generated/**"]
 }

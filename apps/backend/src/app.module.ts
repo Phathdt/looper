@@ -52,7 +52,7 @@ const demoStatsPlugin = {
 @Module({
   imports: [
     LoggerModule.forRoot(loggerConfig),
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 600 }]),
     PrismaModule,
     UserModule,
     CommentModule,

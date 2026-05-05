@@ -26,5 +26,7 @@ apps/backend/prisma/generated
 
 # claude
 .claude_sessions/
+plans
 
 apps/e2e/test-results
+**/coverage*

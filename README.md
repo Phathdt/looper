@@ -2,19 +2,20 @@
 
 Mini social-feed fullstack demo built around a GraphQL API with end-to-end type safety.
 Showcases the N+1 problem, DataLoader batching, cursor pagination, clean architecture,
-and a fully tested React 19 + NestJS 11 stack inside a Turborepo monorepo.
+rate limiting, Zod validation, snake_case DB layer (Prisma `@map`), and a 100%-covered
+React 19 + NestJS 11 stack inside a Turborepo monorepo.
 
 ## Stack
 
-| Layer            | Tech                                                                                   |
-| ---------------- | -------------------------------------------------------------------------------------- |
-| Monorepo         | Turborepo, pnpm workspaces                                                             |
-| Frontend         | React 19, Vite 8, Tailwind 4, TanStack Query 5, React Hook Form + Zod, GraphQL Codegen |
-| Backend          | NestJS 11, Apollo 5, GraphQL 16, Prisma 7 + PostgreSQL, DataLoader, nestjs-zod, Pino   |
-| Dev runtime (BE) | swc-node/register --watch (single-process, ESM, decorator metadata)                    |
-| Bundler (BE)     | rolldown (CJS, externalize deps) → `dist/main.cjs`                                     |
-| Testing          | Vitest 4, Testcontainers, Cucumber + Playwright (E2E)                                  |
-| Tooling          | oxlint v1, prettier (sort-imports), lefthook, lint-staged, knip, barrelsby, TS 5.9     |
+| Layer            | Tech                                                                                                                    |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Monorepo         | Turborepo, pnpm workspaces                                                                                              |
+| Frontend         | React 19, Vite 8, Tailwind 4, TanStack Query 5, React Hook Form + Zod, GraphQL Codegen                                  |
+| Backend          | NestJS 11, Apollo 5, GraphQL 16, Prisma 7 + PostgreSQL (snake_case via `@map`), DataLoader, nestjs-zod, Throttler, Pino |
+| Dev runtime (BE) | swc-node/register --watch (single-process, ESM, decorator metadata)                                                     |
+| Bundler (BE)     | rolldown (CJS, externalize deps) → `dist/main.cjs`                                                                      |
+| Testing          | Vitest 4 (unit + integration + coverage configs), Testcontainers, Cucumber + Playwright (E2E)                           |
+| Tooling          | oxlint v1, prettier (sort-imports), lefthook, lint-staged, knip, barrelsby, TS 5.9                                      |
 
 ## Project layout
 
@@ -85,34 +86,38 @@ Seeded credentials: `alice@looper.dev` / `password123`.
 
 ## Backend (`apps/backend`)
 
-**3-layer clean architecture** per module:
+**3-layer clean architecture** per module — transport (resolvers/DataLoader/GraphQL DTOs) hoisted to `src/` root, modules expose ports only:
 
 ```
-modules/<feature>/
-├── domain/
-│   ├── entities/<feature>.entity.ts       # pure TS interface, NO decorators
-│   ├── interfaces/                        # abstract IXxxService + IXxxRepository (DI tokens)
-│   ├── dto/                               # @InputType + Zod schemas
-│   └── errors.ts
-├── application/services/                  # XxxService implements IXxxService
-├── infrastructure/
-│   ├── graphql/<feature>.type.ts          # @ObjectType('Xxx') GraphQL DTO
-│   ├── repositories/                      # XxxPrismaRepository implements IXxxRepository
-│   └── resolvers/
-├── <feature>.module.ts                    # provide IXxx, useClass Xxx
-├── *.spec.ts / *.integration.spec.ts
-└── index.ts                               # barrelsby-generated
+src/
+├── resolvers/                              # @Resolver — ALL transport here
+├── graphql/                                # @ObjectType DTOs + DataLoader
+└── modules/<feature>/
+    ├── domain/
+    │   ├── entities/<feature>.entity.ts    # pure TS POJO, NO decorators
+    │   ├── interfaces/                     # abstract IXxxService + IXxxRepository (DI tokens)
+    │   ├── dto/                            # Zod schemas (scalar) + @InputType (objects)
+    │   └── errors.ts                       # NestJS HttpException subclasses
+    ├── application/services/               # XxxService — NO @Injectable, NO @nestjs/* imports
+    ├── infrastructure/
+    │   ├── repositories/                   # XxxPrismaRepository implements IXxxRepository
+    │   └── token/                          # framework adapters (e.g. JwtTokenSigner)
+    ├── <feature>.module.ts                 # useFactory + inject for services, useClass for repos
+    └── index.ts                            # barrelsby-generated
 ```
 
-- **Modules**: `auth, user, post, comment, follow, feed, dataloader, prisma`
-- **Naming**: abstract `IXxxService`/`IXxxRepository` (interface marker) vs concrete `XxxService`/`XxxPrismaRepository`
-- **Path aliases**: single source in `tsconfig.json` (`@modules/<name>`, `@common/*`); vitest reads via `vite-tsconfig-paths`, rolldown via `resolve.tsconfigFilename`, swc-node-register inherits from tsconfig
-- **Domain entities are POJO interfaces** — no `@nestjs/graphql` import; GraphQL types live in `infrastructure/graphql/*.type.ts` decorated with `@ObjectType('Xxx')` to preserve schema names
-- **Application services depend on `IXxxRepository`** — never `PrismaService`. Prisma impls map row → entity via `toUser/toPost/...` functions; password isolated via `UserCredentials` type + `findCredentialsByEmail`
-- **Validation**: `nestjs-zod`'s `ZodValidationPipe` per-arg (input only); output trusts BE producers
-- **Prisma 7** driver-adapter pattern: `PrismaPg` from `@prisma/adapter-pg` + `prisma.config.ts` for migrations (no `url` in schema)
-- **Seed** deterministic for e2e reproducibility
-- **DataLoader** injects `IXxxRepository` — per-request loaders for `userById`, `commentsByPost`, `followersCountByUser`, `isFollowingByUser`, eliminating N+1 on nested feed queries
+- **Domain modules**: `auth, user, post, comment, follow, like, feed, prisma`
+- **Naming**: abstract `IXxxService`/`IXxxRepository` (interface marker = DI token) vs concrete `XxxService`/`XxxPrismaRepository` (technology marker)
+- **Path aliases**: single source in `tsconfig.json` (`@modules/<name>`, `@common/*`, `@graphql/*`, `@resolvers/*`); vitest reads via `vite-tsconfig-paths`, rolldown via `resolve.tsconfigFilename`, swc-node-register inherits from tsconfig
+- **Framework-agnostic application** — services have ZERO `@nestjs/*` imports, no `@Injectable()`. Wire via `useFactory` in module. Domain entities are POJO interfaces.
+- **Prisma impls** map row → entity via `toUser/toPost/...` functions; password isolated via `UserCredentials` type + `findCredentialsByEmail`
+- **Validation**: `nestjs-zod`'s `ZodValidationPipe` per-arg — Zod schemas live in `domain/dto/*.schema.ts` (e.g., `post-content.schema.ts` cap 5000 chars, `comment-content.schema.ts` cap 500 chars)
+- **Rate limiting**: `@nestjs/throttler` with custom `GqlThrottlerGuard` — global 100/min, `createPost` 20/min, `addComment` 30/min
+- **JWT secret** fail-fast: `auth.module.ts` throws at boot if `NODE_ENV=production` and `JWT_SECRET` missing
+- **Prisma 7** driver-adapter pattern: `PrismaPg` from `@prisma/adapter-pg` + `prisma.config.ts` for migrations (no `url` in schema). Tables/columns are **snake_case** via `@map`/`@@map` (Prisma client API stays camelCase)
+- **Seed** deterministic for e2e reproducibility — 5 users, 20 posts, 40 comments, 10 follows, 54 likes
+- **DataLoader** injects `IXxxRepository` — per-request loaders: `userById`, `commentsByPost`, `followersCountByUser`, `isFollowingByUser`, `likesCountByPost`, `isLikedByPost`, `postsByAuthor`. Toggle batching with header `x-disable-dataloader: 1`; demo plugin returns `extensions.queryCount`.
+- **LikeService** validates (post exists + chặn self-like) before delegating; FollowService chặn self-follow; UserService trả `UserNotFoundError`
 - **Dev**: `node --import @swc-node/register/esm-register --watch src/main.ts` — single process, SWC handles decorator metadata (esbuild/tsx don't)
 
 ## Frontend (`apps/frontend`)
@@ -127,36 +132,37 @@ modules/<feature>/
 
 - **Stack**: Cucumber 12 + Playwright + Pino
 - **Page Objects** in `page-objects/` — login, register, feed, create-post, profile
-- **Features**: auth (login/register/logout/auth-guard/persistence), feed (smoke, pagination), post (create, add-comment), user (follow)
+- **Features**: auth (login/register/logout/auth-guard/persistence), feed (smoke, pagination), post (create, add-comment, like)
+  , user (follow)
 - **Run**:
   ```bash
   pnpm --filter e2e exec playwright install chromium    # one-time
   pnpm dev                                              # in another terminal
-  pnpm test:e2e                                         # 13 scenarios / 46 steps
+  pnpm test:e2e                                         # 15 scenarios / 64 steps
   ```
 
 ## Test counts (current)
 
 | Suite                                                    | Count                   | Time |
 | -------------------------------------------------------- | ----------------------- | ---- |
-| BE unit (`*.spec.ts`)                                    | 13                      | <1s  |
-| BE integration (`*.integration.spec.ts`, testcontainers) | 63 / 8 files            | ~9s  |
-| FE (colocated unit + hooks)                              | 91 / 24 files           | ~3s  |
-| E2E (Cucumber + Playwright)                              | 13 scenarios / 46 steps | ~8s  |
-| **Total automated**                                      | **180**                 |      |
+| BE unit (`*.spec.ts` colocated next to source)           | 106 / 18 files          | <1s  |
+| BE integration (`*.integration.spec.ts`, testcontainers) | 91 / 15 files           | ~17s |
+| FE (colocated unit + hooks)                              | 95 / 24 files           | ~3s  |
+| E2E (Cucumber + Playwright)                              | 15 scenarios / 64 steps | ~10s |
+| **Total automated**                                      | **307**                 |      |
 
 ### Coverage
 
 |          | Statements | Branches | Functions | Lines |
 | -------- | ---------- | -------- | --------- | ----- |
-| Backend  | 96.6%      | 91.2%    | 95.7%     | 97.8% |
+| Backend  | **100%**   | **100%** | **100%**  | 100%  |
 | Frontend | 98.3%      | 86.5%    | 95.1%     | 99.4% |
 
-Thresholds: BE 80/75/80/80 · FE 90/80/85/90. Prisma repos 100% (4 dedicated repo specs).
+Thresholds: **BE 99/99/99/99** · FE 90/80/85/90. Backend coverage scope (via `vitest.coverage.config.ts`): all application services, domain (cursor + zod schemas), infrastructure (prisma-repos + token adapter), DataLoader, common request-context. Resolvers tested via `*.resolver.integration.spec.ts` + `*.resolver.spec.ts` but excluded from numeric report (NestJS decorator line-attribution interferes with Istanbul/v8).
 
 ## N+1 demo
 
-Run the feed query and observe Prisma logs:
+Run the feed query and observe Prisma logs (every SQL is logged with `#seq` + `dl=on/off` prefix in dev):
 
 ```graphql
 query {
@@ -164,10 +170,15 @@ query {
     edges {
       node {
         id
+        likesCount
+        isLiked
         author {
+          id
           name
         }
         comments {
+          id
+          content
           author {
             name
           }
@@ -178,8 +189,14 @@ query {
 }
 ```
 
-Without DataLoader: 1 + N + N×M queries.
-With DataLoader: ~5 queries regardless of page size.
+Toggle batching live with header `x-disable-dataloader: 1`. Server returns `extensions.queryCount` in every response.
+
+| Mode               | SQL count for above query                                   |
+| ------------------ | ----------------------------------------------------------- |
+| DataLoader **on**  | ~7 queries (1 feed + batched author/comments/likes/isLiked) |
+| DataLoader **off** | ~80 queries (classic N+1)                                   |
+
+For deeper nested case (`feed > author > posts > likesCount`): ~10 SQL with DataLoader vs ~133 without.
 
 ## Docker
 

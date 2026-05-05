@@ -65,6 +65,12 @@ describe('FeedService (unit)', () => {
     expect((postRepo.findFeedPage as ReturnType<typeof vi.fn>).mock.calls[1][1]).toBe(51)
   })
 
+  it('uses default first=10 when arg omitted', async () => {
+    const { service, postRepo } = makeService([])
+    await service.feed('u1')
+    expect((postRepo.findFeedPage as ReturnType<typeof vi.fn>).mock.calls[0][1]).toBe(11)
+  })
+
   it('passes decoded cursor to findFeedPage', async () => {
     const { service, postRepo } = makeService([])
     const after = encodeCursor({ createdAt: new Date('2026-01-01T00:00:05Z'), id: 'p5' })

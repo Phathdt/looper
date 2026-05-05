@@ -402,6 +402,13 @@ describe('DataLoaderService non-batch mode', () => {
     expect(result).toBe(42)
   })
 
+  it('followersCountByUser.load returns 0 when map empty in non-batch mode', async () => {
+    const countFollowers = vi.fn(async () => new Map<string, number>())
+    const { svc } = makeService({ countFollowers })
+    const loaders = svc.createLoaders('viewer', { batch: false })
+    expect(await loaders.followersCountByUser.load('user-with-no-followers')).toBe(0)
+  })
+
   it('isFollowingByUser.load calls isFollowingBatch when viewerId set and batch=false', async () => {
     const isFollowingBatch = vi.fn(async (viewerId: string, userIds: string[]) => new Set(userIds))
     const { svc, follows } = makeService({ isFollowingBatch })
@@ -437,6 +444,13 @@ describe('DataLoaderService non-batch mode', () => {
 
     expect((likes.countByPostIds as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(1)
     expect(result).toBe(99)
+  })
+
+  it('likesCountByPost.load returns 0 when map empty in non-batch mode', async () => {
+    const countByPostIds = vi.fn(async () => new Map<string, number>())
+    const { svc } = makeService({ countByPostIds })
+    const loaders = svc.createLoaders('viewer', { batch: false })
+    expect(await loaders.likesCountByPost.load('post-with-no-likes')).toBe(0)
   })
 
   it('isLikedByPost.load calls likedByViewer when viewerId set and batch=false', async () => {

@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { IFollowRepository } from '../follow/domain/interfaces/follow.repository'
-import type { IPostRepository } from '../post/domain/interfaces/post.repository'
-import { FeedService } from './application/services/feed.service'
-import { decodeCursor, encodeCursor } from './domain/feed-cursor'
+import type { IFollowRepository } from '../../../follow/domain/interfaces/follow.repository'
+import type { IPostRepository } from '../../../post/domain/interfaces/post.repository'
+import { decodeCursor, encodeCursor } from '../../domain/feed-cursor'
+import { FeedService } from './feed.service'
 
 const makePost = (i: number) => ({
   id: `p${i}`,

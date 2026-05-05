@@ -2,9 +2,9 @@ import type { IPostRepository } from '@modules/post'
 
 import { describe, expect, it, vi } from 'vitest'
 
-import { LikeService } from './application/services/like.service'
-import { CannotLikeOwnPostError, PostNotFoundError } from './domain/errors'
-import type { ILikeRepository } from './domain/interfaces/like.repository'
+import { CannotLikeOwnPostError, PostNotFoundError } from '../../domain/errors'
+import type { ILikeRepository } from '../../domain/interfaces/like.repository'
+import { LikeService } from './like.service'
 
 function makeRepo() {
   return {

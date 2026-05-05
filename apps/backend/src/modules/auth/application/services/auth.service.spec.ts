@@ -1,10 +1,10 @@
 import { compare, hash } from 'bcryptjs'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { IUserRepository } from '../user/domain/interfaces/user.repository'
-import { AuthService } from './application/services/auth.service'
-import { EmailAlreadyRegisteredError, InvalidCredentialsError } from './domain/errors'
-import type { ITokenSigner } from './domain/interfaces/token-signer'
+import type { IUserRepository } from '../../../user/domain/interfaces/user.repository'
+import { EmailAlreadyRegisteredError, InvalidCredentialsError } from '../../domain/errors'
+import type { ITokenSigner } from '../../domain/interfaces/token-signer'
+import { AuthService } from './auth.service'
 
 function makeService() {
   const users = {

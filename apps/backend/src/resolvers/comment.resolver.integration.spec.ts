@@ -73,4 +73,40 @@ describe('CommentResolver (integration)', () => {
 
     expect(commentRes.data.addComment.author.name).toBe('AuthorForComment')
   })
+
+  it('addComment rejects empty content', async () => {
+    const reg = await harness.gql(`mutation($i: RegisterInput!) { register(input: $i) { token user { id } } }`, {
+      i: { name: 'EmptyCommenter', email: `ec-${Date.now()}@x.x`, password: 'pw12345' },
+    })
+    const post = await harness.gql(
+      `mutation($content: String!) { createPost(content: $content) { id } }`,
+      { content: 'host post' },
+      reg.data.register.token,
+    )
+
+    const res = await harness.gql(
+      `mutation($postId: ID!, $content: String!) { addComment(postId: $postId, content: $content) { id } }`,
+      { postId: post.data.createPost.id, content: '' },
+      reg.data.register.token,
+    )
+    expect(res.errors?.[0]?.message).toMatch(/validation/i)
+  })
+
+  it('addComment rejects content longer than 500 chars', async () => {
+    const reg = await harness.gql(`mutation($i: RegisterInput!) { register(input: $i) { token user { id } } }`, {
+      i: { name: 'LongCommenter', email: `lcm-${Date.now()}@x.x`, password: 'pw12345' },
+    })
+    const post = await harness.gql(
+      `mutation($content: String!) { createPost(content: $content) { id } }`,
+      { content: 'host post 2' },
+      reg.data.register.token,
+    )
+
+    const res = await harness.gql(
+      `mutation($postId: ID!, $content: String!) { addComment(postId: $postId, content: $content) { id } }`,
+      { postId: post.data.createPost.id, content: 'x'.repeat(501) },
+      reg.data.register.token,
+    )
+    expect(res.errors?.[0]?.message).toMatch(/validation/i)
+  })
 })

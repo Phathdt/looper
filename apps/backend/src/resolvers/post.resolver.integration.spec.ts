@@ -55,6 +55,43 @@ describe('PostResolver (integration)', () => {
     expect(contents).toContain('hello integration')
   })
 
+  it('createPost rejects empty content', async () => {
+    const reg = await harness.gql(`mutation($i: RegisterInput!) { register(input: $i) { token } }`, {
+      i: { name: 'EmptyContent', email: `ec-${Date.now()}@x.x`, password: 'pw12345' },
+    })
+    const res = await harness.gql(
+      `mutation($content: String!) { createPost(content: $content) { id } }`,
+      { content: '' },
+      reg.data.register.token,
+    )
+    expect(res.errors?.[0]?.message).toMatch(/validation/i)
+    expect(res.data?.createPost).toBeFalsy()
+  })
+
+  it('createPost rejects whitespace-only content', async () => {
+    const reg = await harness.gql(`mutation($i: RegisterInput!) { register(input: $i) { token } }`, {
+      i: { name: 'WSContent', email: `ws-${Date.now()}@x.x`, password: 'pw12345' },
+    })
+    const res = await harness.gql(
+      `mutation($content: String!) { createPost(content: $content) { id } }`,
+      { content: '    \n  \t' },
+      reg.data.register.token,
+    )
+    expect(res.errors?.[0]?.message).toMatch(/validation/i)
+  })
+
+  it('createPost rejects content longer than 5000 chars', async () => {
+    const reg = await harness.gql(`mutation($i: RegisterInput!) { register(input: $i) { token } }`, {
+      i: { name: 'LongContent', email: `lc-${Date.now()}@x.x`, password: 'pw12345' },
+    })
+    const res = await harness.gql(
+      `mutation($content: String!) { createPost(content: $content) { id } }`,
+      { content: 'a'.repeat(5001) },
+      reg.data.register.token,
+    )
+    expect(res.errors?.[0]?.message).toMatch(/validation/i)
+  })
+
   it('post resolver field comments returns empty when no comments', async () => {
     const userReg = await harness.gql(`mutation($i: RegisterInput!) { register(input: $i) { token user { id } } }`, {
       i: { name: 'NoCommentPoster', email: `ncp-${Date.now()}@x.x`, password: 'pw12345' },

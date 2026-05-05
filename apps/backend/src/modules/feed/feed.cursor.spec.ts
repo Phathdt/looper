@@ -1,3 +1,5 @@
+import { BadRequestException } from '@nestjs/common'
+
 import { describe, expect, it } from 'vitest'
 
 import { decodeCursor, encodeCursor } from './domain/feed-cursor'
@@ -13,8 +15,18 @@ describe('feed cursor', () => {
     expect(new Date(decoded.createdAt).toISOString()).toBe(post.createdAt.toISOString())
   })
 
-  it('throws on invalid cursor', () => {
-    expect(() => decodeCursor('not-base64')).toThrow()
+  it('throws BadRequestException on garbage cursor', () => {
+    expect(() => decodeCursor('not-base64')).toThrow(BadRequestException)
+  })
+
+  it('throws BadRequestException on cursor missing separator', () => {
+    const encoded = Buffer.from('only-one-part').toString('base64url')
+    expect(() => decodeCursor(encoded)).toThrow(BadRequestException)
+  })
+
+  it('throws BadRequestException on cursor with invalid date', () => {
+    const encoded = Buffer.from('not-a-date|some-id').toString('base64url')
+    expect(() => decodeCursor(encoded)).toThrow(BadRequestException)
   })
 
   it('produces distinct cursors for different posts', () => {

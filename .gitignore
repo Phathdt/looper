@@ -31,3 +31,6 @@ plans
 apps/e2e/test-results
 **/coverage*
 
+# repomix snapshots
+repomix-output.*
+

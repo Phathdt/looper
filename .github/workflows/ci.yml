@@ -1,0 +1,163 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22.14.0'
+  PNPM_VERSION: '10.33.3'
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/looper?schema=public
+  JWT_SECRET: ci-test-secret
+  PORT: '4000'
+  NODE_ENV: development
+
+jobs:
+  lint:
+    name: lint + typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter backend prisma:generate
+      - name: typecheck (3 workspaces)
+        run: pnpm exec turbo run type-check
+      - name: oxlint
+        run: pnpm lint
+
+  backend:
+    name: backend tests + 99% coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # No Postgres service — integration tests use testcontainers (auto-spawn
+    # isolated Postgres per test file via Docker available on GH runners).
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter backend prisma:generate
+      - name: unit tests
+        run: pnpm --filter backend test:unit
+      - name: integration tests (testcontainers)
+        run: pnpm --filter backend test:integration
+      - name: coverage with 99% thresholds (fails if below)
+        run: pnpm --filter backend test:coverage
+
+  frontend:
+    name: frontend tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: codegen (uses committed schema.gql)
+        run: pnpm --filter frontend generate
+      - name: vitest
+        run: pnpm --filter frontend test
+
+  e2e:
+    name: e2e (cucumber + playwright, parallel=2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: looper
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter backend prisma:generate
+      - name: codegen frontend graphql hooks (needed for Vite dev)
+        run: pnpm --filter frontend generate
+      - name: cache playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('apps/e2e/pnpm-lock.yaml', 'pnpm-lock.yaml') }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: pnpm --filter e2e exec playwright install chromium
+      - name: migrate + seed db
+        run: |
+          pnpm --filter backend exec prisma migrate deploy
+          pnpm --filter backend prisma:seed
+      - name: start backend (background)
+        run: |
+          pnpm --filter backend dev > /tmp/be.log 2>&1 &
+          echo "BE_PID=$!" >> $GITHUB_ENV
+          for i in {1..30}; do
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/graphql | grep -q "400"; then
+              echo "BE ready"
+              break
+            fi
+            sleep 1
+          done
+      - name: start frontend (background)
+        run: |
+          pnpm --filter frontend dev > /tmp/fe.log 2>&1 &
+          echo "FE_PID=$!" >> $GITHUB_ENV
+          for i in {1..30}; do
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:5173 | grep -q "200"; then
+              echo "FE ready"
+              break
+            fi
+            sleep 1
+          done
+      - name: cucumber e2e (parallel=2)
+        run: pnpm test:e2e
+      - name: dump server logs on failure
+        if: failure()
+        run: |
+          echo "=== BE LOG ==="
+          tail -200 /tmp/be.log || true
+          echo "=== FE LOG ==="
+          tail -200 /tmp/fe.log || true
+      - name: upload e2e test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: apps/e2e/test-results/
+          if-no-files-found: ignore
+          retention-days: 7

@@ -1,5 +1,7 @@
 # Looper
 
+[![CI](https://github.com/Phathdt/looper/actions/workflows/ci.yml/badge.svg)](https://github.com/Phathdt/looper/actions/workflows/ci.yml)
+
 Mini social-feed fullstack demo built around a GraphQL API with end-to-end type safety.
 Showcases the N+1 problem, DataLoader batching, cursor pagination, clean architecture,
 rate limiting, Zod validation, snake_case DB layer (Prisma `@map`), and a 100%-covered

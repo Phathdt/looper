@@ -18,6 +18,8 @@
     "knip": "knip",
     "knip:fix": "knip --fix",
     "barrels": "barrelsby --config .barrelsby.json && pnpm format",
+    "repomix": "repomix",
+    "repomix:lean": "repomix --ignore \"**/*.spec.ts,**/*.test.ts,**/*.test.tsx,**/*.integration.spec.ts,**/test/**,**/test-utils/**\" -o repomix-output.lean.xml",
     "format": "prettier --write \"**/*.{ts,tsx,js,cjs,mjs,json,md,yml,yaml,graphql}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,cjs,mjs,json,md,yml,yaml,graphql}\"",
     "db:up": "docker compose up -d postgres",

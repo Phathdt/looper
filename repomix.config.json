@@ -1,0 +1,60 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "repomix-output.xml",
+    "style": "xml",
+    "parsableStyle": false,
+    "compress": false,
+    "headerText": "Looper monorepo (Turborepo) — apps: backend (NestJS+GraphQL+Prisma), frontend (React+Vite), e2e (Cucumber+Playwright). 3-layer clean architecture in backend.",
+    "fileSummary": true,
+    "directoryStructure": true,
+    "removeComments": false,
+    "removeEmptyLines": true,
+    "topFilesLength": 10,
+    "showLineNumbers": false,
+    "copyToClipboard": false,
+    "git": {
+      "sortByChanges": true,
+      "sortByChangesMaxCommits": 100
+    }
+  },
+  "include": [],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "pnpm-lock.yaml",
+      "package-lock.json",
+      "yarn.lock",
+      "repomix-output.*",
+      ".repomixignore",
+      ".turbo/**",
+      "**/.turbo/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/coverage/**",
+      "**/.next/**",
+      "**/.vite/**",
+      "**/node_modules/**",
+      "apps/frontend/src/generated/**",
+      "apps/backend/prisma/generated/**",
+      "apps/e2e/test-results/**",
+      "apps/e2e/reports/**",
+      "**/*.snap",
+      "**/__snapshots__/**",
+      "plans/**",
+      "docs/visuals/**",
+      ".claude_sessions/**",
+      ".github/**",
+      "**/*.log",
+      "**/.DS_Store",
+      "**/*.tsbuildinfo"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  },
+  "tokenCount": {
+    "encoding": "o200k_base"
+  }
+}

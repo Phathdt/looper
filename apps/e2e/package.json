@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "test": "cucumber-js --config .cucumber.js 2>&1 | tee test-results/test-output.log",
+    "test": "mkdir -p test-results && cucumber-js --config .cucumber.js",
     "test:headed": "HEADLESS=false cucumber-js --config .cucumber.js",
     "test:smoke": "cucumber-js --config .cucumber.js --tags @smoke",
     "test:auth": "cucumber-js --config .cucumber.js --tags @auth",

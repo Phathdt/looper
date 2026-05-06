@@ -33,6 +33,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter backend prisma:generate
+      - name: codegen frontend (typecheck needs src/generated/graphql.ts)
+        run: pnpm --filter frontend generate
       - name: typecheck (3 workspaces)
         run: pnpm exec turbo run type-check
       - name: oxlint

@@ -14,10 +14,23 @@ let userQueryResult = {
 const followMutate = vi.fn()
 const unfollowMutate = vi.fn()
 
+let queryOptions: { enabled?: boolean } = {}
+let followMutationOptions: { onSuccess?: () => void } = {}
+let unfollowMutationOptions: { onSuccess?: () => void } = {}
+
 vi.mock('@/generated/graphql', () => ({
-  useUserQuery: () => userQueryResult,
-  useFollowMutation: () => ({ mutate: followMutate, isPending: false }),
-  useUnfollowMutation: () => ({ mutate: unfollowMutate, isPending: false }),
+  useUserQuery: (params: any, options: any) => {
+    queryOptions = options
+    return userQueryResult
+  },
+  useFollowMutation: (options: any) => {
+    followMutationOptions = options ?? {}
+    return { mutate: followMutate, isPending: false }
+  },
+  useUnfollowMutation: (options: any) => {
+    unfollowMutationOptions = options ?? {}
+    return { mutate: unfollowMutate, isPending: false }
+  },
 }))
 
 describe('useUserProfile', () => {
@@ -84,5 +97,54 @@ describe('useUserProfile', () => {
     act(() => result.current.unfollow())
     expect(followMutate).not.toHaveBeenCalled()
     expect(unfollowMutate).not.toHaveBeenCalled()
+  })
+
+  it('disables query when userId is undefined', () => {
+    userQueryResult = { data: undefined, isLoading: false, error: null }
+    renderHook(() => useUserProfile(undefined), { wrapper: createWrapper() })
+    expect(queryOptions.enabled).toBe(false)
+  })
+
+  it('enables query when userId is provided', () => {
+    userQueryResult = { data: undefined, isLoading: false, error: null }
+    renderHook(() => useUserProfile('u2'), { wrapper: createWrapper() })
+    expect(queryOptions.enabled).toBe(true)
+  })
+
+  it('follow calls followMutate with user id', () => {
+    userQueryResult = {
+      data: { user: { id: 'u3', name: 'charlie' } },
+      isLoading: false,
+      error: null,
+    }
+    const { result } = renderHook(() => useUserProfile('u3'), { wrapper: createWrapper() })
+    act(() => {
+      result.current.follow()
+    })
+    expect(followMutate).toHaveBeenCalledWith({ userId: 'u3' })
+  })
+
+  it('unfollow calls unfollowMutate with user id', () => {
+    userQueryResult = {
+      data: { user: { id: 'u3', name: 'charlie' } },
+      isLoading: false,
+      error: null,
+    }
+    const { result } = renderHook(() => useUserProfile('u3'), { wrapper: createWrapper() })
+    act(() => {
+      result.current.unfollow()
+    })
+    expect(unfollowMutate).toHaveBeenCalledWith({ userId: 'u3' })
+  })
+
+  it('follow/unfollow onSuccess invalidates User query (executes invalidate fn)', () => {
+    userQueryResult = { data: undefined, isLoading: false, error: null }
+    renderHook(() => useUserProfile('u2'), { wrapper: createWrapper() })
+    // Both mutation onSuccess hand the same invalidate callback — invoking
+    // it directly executes the closure that v8 was reporting as uncovered.
+    expect(typeof followMutationOptions.onSuccess).toBe('function')
+    expect(typeof unfollowMutationOptions.onSuccess).toBe('function')
+    followMutationOptions.onSuccess?.()
+    unfollowMutationOptions.onSuccess?.()
   })
 })

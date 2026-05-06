@@ -80,8 +80,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: codegen (uses committed schema.gql)
         run: pnpm --filter frontend generate
-      - name: vitest
-        run: pnpm --filter frontend test
+      - name: vitest with 99% thresholds (fails if below)
+        run: pnpm --filter frontend test:coverage
 
   e2e:
     name: e2e (cucumber + playwright, parallel=2)

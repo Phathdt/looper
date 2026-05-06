@@ -10,11 +10,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mutate = vi.fn()
 let mutationOptions: { onSuccess?: (d: unknown) => void; onError?: (e: Error) => void } = {}
+let isPending = false
 
 vi.mock('@/generated/graphql', () => ({
   useRegisterMutation: (opts: typeof mutationOptions) => {
     mutationOptions = opts
-    return { mutate, isPending: false }
+    return {
+      mutate,
+      get isPending() {
+        return isPending
+      },
+    }
   },
 }))
 
@@ -78,5 +84,12 @@ describe('<RegisterPage />', () => {
     await userEvent.click(screen.getByRole('button', { name: /register|sign up|create/i }))
     mutationOptions.onError?.('weird' as unknown as Error)
     expect(await screen.findByRole('alert')).toBeInTheDocument()
+  })
+
+  it('shows pending state when mutation is loading', () => {
+    isPending = true
+    renderPage()
+    expect(screen.getByRole('button', { name: /creating account/i })).toBeDisabled()
+    isPending = false
   })
 })

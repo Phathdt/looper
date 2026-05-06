@@ -10,11 +10,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mutate = vi.fn()
 let mutationOptions: { onSuccess?: (d: unknown) => void; onError?: (e: Error) => void } = {}
+let isPending = false
 
 vi.mock('@/generated/graphql', () => ({
   useLoginMutation: (opts: typeof mutationOptions) => {
     mutationOptions = opts
-    return { mutate, isPending: false }
+    return {
+      mutate,
+      get isPending() {
+        return isPending
+      },
+    }
   },
 }))
 
@@ -79,5 +85,12 @@ describe('<LoginPage />', () => {
     await userEvent.click(screen.getByRole('button', { name: /sign in/i }))
     mutationOptions.onError?.('oops' as unknown as Error)
     expect(await screen.findByRole('alert')).toBeInTheDocument()
+  })
+
+  it('shows pending state when mutation is loading', () => {
+    isPending = true
+    renderPage()
+    expect(screen.getByRole('button', { name: /signing in/i })).toBeDisabled()
+    isPending = false
   })
 })

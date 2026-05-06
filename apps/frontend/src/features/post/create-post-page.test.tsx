@@ -9,11 +9,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mutate = vi.fn()
 let mutationOptions: { onSuccess?: () => void; onError?: (e: Error) => void } = {}
+let isPending = false
 
 vi.mock('@/generated/graphql', () => ({
   useCreatePostMutation: (opts: typeof mutationOptions) => {
     mutationOptions = opts
-    return { mutate, isPending: false }
+    return {
+      mutate,
+      get isPending() {
+        return isPending
+      },
+    }
   },
 }))
 
@@ -66,5 +72,31 @@ describe('<CreatePostPage />', () => {
     await userEvent.click(screen.getByRole('button', { name: /^post$/i }))
     mutationOptions.onError?.('x' as unknown as Error)
     expect(await screen.findByRole('alert')).toBeInTheDocument()
+  })
+
+  it('shows posting state when mutation is pending', () => {
+    isPending = true
+    renderPage()
+    expect(screen.getByRole('button', { name: /posting/i })).toBeDisabled()
+    isPending = false
+  })
+
+  it('disables cancel button when mutation is pending', () => {
+    isPending = true
+    renderPage()
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled()
+    isPending = false
+  })
+
+  it('clears server error on successful submit', async () => {
+    renderPage()
+    await userEvent.type(screen.getByPlaceholderText(/mind/i), 'hi')
+    await userEvent.click(screen.getByRole('button', { name: /^post$/i }))
+    mutationOptions.onError?.(new Error('Previous error'))
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
+    await userEvent.clear(screen.getByPlaceholderText(/mind/i))
+    await userEvent.type(screen.getByPlaceholderText(/mind/i), 'new post')
+    await userEvent.click(screen.getByRole('button', { name: /^post$/i }))
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 })

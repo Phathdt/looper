@@ -27,11 +27,23 @@ let userState: {
 
 const followMutate = vi.fn()
 const unfollowMutate = vi.fn()
+let followIsFollowing = false
+let unfollowIsUnfollowing = false
 
 vi.mock('@/generated/graphql', () => ({
   useUserQuery: () => userState,
-  useFollowMutation: () => ({ mutate: followMutate, isPending: false }),
-  useUnfollowMutation: () => ({ mutate: unfollowMutate, isPending: false }),
+  useFollowMutation: () => ({
+    mutate: followMutate,
+    get isPending() {
+      return followIsFollowing
+    },
+  }),
+  useUnfollowMutation: () => ({
+    mutate: unfollowMutate,
+    get isPending() {
+      return unfollowIsUnfollowing
+    },
+  }),
 }))
 
 function renderPage(path = '/user/u2') {
@@ -125,5 +137,47 @@ describe('<UserProfilePage />', () => {
     renderPage()
     expect(screen.queryByRole('button', { name: /^follow$/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^unfollow$/i })).not.toBeInTheDocument()
+  })
+
+  it('shows "Following…" text when follow mutation is pending', () => {
+    followIsFollowing = true
+    userState = {
+      isLoading: false,
+      error: null,
+      data: {
+        user: {
+          id: 'u2',
+          name: 'bob',
+          email: 'bob@x.x',
+          followersCount: 5,
+          isFollowing: false,
+          posts: [],
+        },
+      },
+    }
+    renderPage()
+    expect(screen.getByRole('button', { name: /following/i })).toBeInTheDocument()
+    followIsFollowing = false
+  })
+
+  it('shows "Unfollowing…" text when unfollow mutation is pending', () => {
+    unfollowIsUnfollowing = true
+    userState = {
+      isLoading: false,
+      error: null,
+      data: {
+        user: {
+          id: 'u2',
+          name: 'bob',
+          email: 'bob@x.x',
+          followersCount: 5,
+          isFollowing: true,
+          posts: [],
+        },
+      },
+    }
+    renderPage()
+    expect(screen.getByRole('button', { name: /unfollowing/i })).toBeInTheDocument()
+    unfollowIsUnfollowing = false
   })
 })

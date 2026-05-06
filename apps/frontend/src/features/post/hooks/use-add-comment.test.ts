@@ -7,17 +7,24 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mutate = vi.fn()
 let mutationOptions: { onSuccess?: () => void } = {}
+let mutationIsPending = false
 
 vi.mock('@/generated/graphql', () => ({
   useAddCommentMutation: (opts: typeof mutationOptions) => {
     mutationOptions = opts
-    return { mutate, isPending: false }
+    return {
+      mutate,
+      get isPending() {
+        return mutationIsPending
+      },
+    }
   },
 }))
 
 describe('useAddComment', () => {
   beforeEach(() => {
     mutate.mockReset()
+    mutationIsPending = false
     mutationOptions = {}
   })
 
@@ -54,5 +61,16 @@ describe('useAddComment', () => {
       await result.current.submit()
     })
     expect(mutate).not.toHaveBeenCalled()
+  })
+
+  it('returns isPending state from mutation', () => {
+    mutationIsPending = false
+    const { result } = renderHook(() => useAddComment('p1'), { wrapper: createWrapper() })
+    expect(result.current.isPending).toBe(false)
+
+    mutationIsPending = true
+    const { result: result2 } = renderHook(() => useAddComment('p1'), { wrapper: createWrapper() })
+    expect(result2.current.isPending).toBe(true)
+    mutationIsPending = false
   })
 })

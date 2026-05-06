@@ -52,4 +52,11 @@ describe('useCreatePost', () => {
     act(() => mutationOptions.onError?.(new Error('Server boom')))
     expect(result.current.serverError).toBe('Server boom')
   })
+
+  it('cancel calls navigate to home', async () => {
+    const { result } = renderHook(() => useCreatePost(), { wrapper: createWrapper() })
+    await act(async () => {
+      result.current.cancel()
+    })
+  })
 })

@@ -1,10 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common'
-
-export class CannotLikeOwnPostError extends BadRequestException {
-  constructor() {
-    super('Cannot like your own post')
-  }
-}
+import { NotFoundException } from '@nestjs/common'
 
 export class PostNotFoundError extends NotFoundException {
   constructor(id: string) {

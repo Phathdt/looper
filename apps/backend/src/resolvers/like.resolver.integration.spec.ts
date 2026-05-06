@@ -43,11 +43,13 @@ describe('LikeResolver (integration)', () => {
     expect(res.errors).toBeUndefined()
   })
 
-  it('likePost rejects self-like with CannotLikeOwnPostError', async () => {
+  it('likePost succeeds when liking own post', async () => {
     const u = await makeUserAndPost('self-liker')
     const res = await harness.gql(`mutation($postId: ID!) { likePost(postId: $postId) }`, { postId: u.postId }, u.token)
-    expect(res.errors?.[0]?.message).toMatch(/cannot like your own post/i)
-    expect(res.data?.likePost).toBeFalsy()
+    expect(res.data?.likePost).toBe(true)
+    expect(res.errors).toBeUndefined()
+    const count = await harness.prisma.like.count({ where: { userId: u.userId, postId: u.postId } })
+    expect(count).toBe(1)
   })
 
   it('likePost rejects non-existent post with PostNotFoundError', async () => {
